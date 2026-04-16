@@ -1,0 +1,19 @@
+# Config untuk Vibe Coding - DeepSeek Edition
+models:
+  - title: DeepSeek V3
+    provider: deepseek
+    model: deepseek-chat
+    apiKey: "sk-b634c527f3874ec29ed4346b2dcc4f9a"
+
+tabAutocompleteModel:
+  title: DeepSeek Coder
+  provider: deepseek
+  model: deepseek-coder
+  apiKey: "sk-b634c527f3874ec29ed4346b2dcc4f9a"
+
+# Ini opsional, untuk fitur membaca folder project
+embeddingsProvider:
+  provider: free-trial
+
+# Biarkan kosong jika tidak pakai MCP
+mcpServers: []

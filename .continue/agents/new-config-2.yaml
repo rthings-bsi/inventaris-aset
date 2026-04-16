@@ -1,0 +1,17 @@
+# This is an example configuration file
+# To learn more, see the full config.yaml reference: https://docs.continue.dev/reference
+
+name: Example Config
+version: 1.0.0
+schema: v1
+
+models:
+  - title: DeepSeek V3 (Chat)
+    provider: deepseek
+    model: deepseek-chat
+    apiKey: sk-b634c527f3874ec29ed4346b2dcc4f9a
+
+tabAutocompleteModel:
+  title: Starcoder 2 (Gratis & Cepat)
+  provider: free-trial
+  model: starcoder2-3b

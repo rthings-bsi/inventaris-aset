@@ -1,0 +1,4 @@
+kode_aset,nama_aset,kategori,kondisi,status,lokasi,nilai_perolehan,tanggal_perolehan,penanggung_jawab,deskripsi
+AST-001,Laptop HP ProBook,Elektronik,Baik,Aktif,Ruang Staff,12000000,2026-03-22,Budi Santoso,Laptop operasional
+AST-002,Meja Kerja Kayu,Furniture,Baik,Aktif,Ruang Meeting,1500000,2025-10-15,Admin,Meja rapat utama
+AST-003,Printer Epson L3110,Elektronik,Kurang Baik,Maintenance,Ruang Staff,2500000,2024-05-20,Budi Santoso,Sedang perbaikan head printer

@@ -1,0 +1,4 @@
+asset_code,asset_name,category,location,person_in_charge,condition,status,acquisition_cost,acquisition_date,description
+AST-001,Laptop Lenovo Thinkpad,Electronics,IT Room,John Doe,Good,active,12000000,2026-01-15,Used by Lead Dev
+AST-002,Office Desk Wood,Furniture,Main Office,Jane Smith,Good,active,1500000,2025-11-20,
+AST-003,Projector Epson,Electronics,Meeting Room,Admin,Broken,broken,5500000,2024-05-10,Needs lamp replacement
