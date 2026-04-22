@@ -19,7 +19,14 @@ class AssetLoanTest extends TestCase
     {
         parent::setUp();
         
-        $this->role = Role::create(['name' => 'Admin', 'slug' => 'admin']);
+        // Setup Roles and Permissions
+        Role::create(['name' => 'Admin', 'slug' => 'admin']);
+        Role::create(['name' => 'Staff', 'slug' => 'staff']);
+        
+        \App\Models\RolePermission::create(['role' => 'admin', 'permission' => 'loan.manage']);
+        \App\Models\RolePermission::create(['role' => 'staff', 'permission' => 'loan.view']);
+        \App\Models\RolePermission::create(['role' => 'staff', 'permission' => 'loan.create']);
+        
         $this->admin = User::factory()->create(['role' => 'admin']);
         $this->user = User::factory()->create(['role' => 'staff']);
         
@@ -38,11 +45,8 @@ class AssetLoanTest extends TestCase
         ]);
     }
 
-    public function test_user_can_request_loan()
+    public function test_admin_can_request_loan()
     {
-        // Give permission manually or via seeder if needed
-        // Assuming Admin role has all permissions from hasPermission() logic
-        
         $response = $this->actingAs($this->admin)->post('/loans', [
             'asset_id' => $this->asset->id,
             'notes' => 'Need for presentation'
@@ -51,6 +55,21 @@ class AssetLoanTest extends TestCase
         $response->assertRedirect('/loans');
         $this->assertDatabaseHas('asset_loans', [
             'asset_id' => $this->asset->id,
+            'status' => 'pending'
+        ]);
+    }
+
+    public function test_staff_can_request_loan()
+    {
+        $response = $this->actingAs($this->user)->post('/loans', [
+            'asset_id' => $this->asset->id,
+            'notes' => 'Staff request'
+        ]);
+
+        $response->assertRedirect('/loans');
+        $this->assertDatabaseHas('asset_loans', [
+            'asset_id' => $this->asset->id,
+            'user_id' => $this->user->id,
             'status' => 'pending'
         ]);
     }
@@ -69,5 +88,54 @@ class AssetLoanTest extends TestCase
         $response->assertStatus(302);
         $this->assertEquals('borrowed', $loan->fresh()->status);
         $this->assertEquals($this->user->id, $this->asset->fresh()->user_id);
+    }
+
+    public function test_staff_cannot_approve_loan()
+    {
+        $loan = AssetLoan::create([
+            'asset_id' => $this->asset->id,
+            'user_id' => $this->user->id,
+            'loan_date' => now(),
+            'status' => 'pending'
+        ]);
+
+        $response = $this->actingAs($this->user)->post("/loans/{$loan->id}/approve");
+
+        $response->assertStatus(403);
+        $this->assertEquals('pending', $loan->fresh()->status);
+    }
+
+    public function test_staff_can_return_their_own_loan()
+    {
+        $loan = AssetLoan::create([
+            'asset_id' => $this->asset->id,
+            'user_id' => $this->user->id,
+            'loan_date' => now(),
+            'status' => 'borrowed'
+        ]);
+        $this->asset->update(['user_id' => $this->user->id]);
+
+        $response = $this->actingAs($this->user)->post("/loans/{$loan->id}/return");
+
+        $response->assertStatus(302);
+        $this->assertEquals('returned', $loan->fresh()->status);
+        $this->assertNull($this->asset->fresh()->user_id);
+    }
+    public function test_staff_can_cancel_own_pending_loan()
+    {
+        $loan = AssetLoan::create([
+            'asset_id' => $this->asset->id,
+            'user_id' => $this->user->id,
+            'loan_date' => now(),
+            'status' => 'pending'
+        ]);
+
+        $response = $this->actingAs($this->user)->post("/loans/{$loan->id}/cancel");
+
+        $response->assertStatus(302);
+        
+        $this->assertDatabaseMissing('asset_loans', [
+            'id' => $loan->id
+        ]);
     }
 }

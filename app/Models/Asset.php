@@ -22,6 +22,7 @@ class Asset extends Model
         'condition',
         'location_id',
         'user_id',
+        'person_in_charge',
         'photo',
         'status'
     ];

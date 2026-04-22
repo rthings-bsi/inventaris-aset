@@ -31,6 +31,7 @@ class AssetLoanController extends Controller
         if (!auth()->user()->hasPermission('loan.create')) abort(403);
 
         $query = Asset::whereNull('user_id')
+            ->where('status', 'active')
             ->whereDoesntHave('loans', function ($query) {
                 $query->whereIn('status', ['pending', 'borrowed']);
             })
@@ -84,8 +85,8 @@ class AssetLoanController extends Controller
             'notes' => $request->notes
         ]);
 
-        $admins = \App\Models\User::where('role', 'admin')->get();
-        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\AssetLoanNotification($loan, 'requested', 'Pengajuan peminjaman baru unit ' . $asset->asset_name . ' dari ' . Auth::user()->name));
+        $managers = \App\Models\User::whereIn('role', ['admin', 'supervisor'])->get();
+        \Illuminate\Support\Facades\Notification::send($managers, new \App\Notifications\AssetLoanNotification($loan, 'requested', 'Pengajuan peminjaman baru unit ' . $asset->asset_name . ' dari ' . Auth::user()->name));
 
         return redirect()->route('loans.index')->with('success', 'Pengajuan peminjaman berhasil dikirim dan menunggu persetujuan.');
     }
@@ -109,7 +110,7 @@ class AssetLoanController extends Controller
             'user_id' => $loan->user_id
         ]);
 
-        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'approved', 'Pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda telah disetujui Administrator.'));
+        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'approved', 'Pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda telah disetujui oleh ' . Auth::user()->name . '.'));
 
         return back()->with('success', 'Pengajuan peminjaman disetujui.');
     }
@@ -122,7 +123,7 @@ class AssetLoanController extends Controller
 
         $loan->update(['status' => 'rejected']);
 
-        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'rejected', 'Maaf, pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda ditolak.'));
+        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'rejected', 'Maaf, pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda ditolak oleh ' . Auth::user()->name . '.'));
 
         return back()->with('success', 'Pengajuan peminjaman ditolak.');
     }
@@ -147,10 +148,32 @@ class AssetLoanController extends Controller
             'user_id' => null
         ]);
 
-        $admins = User::where('role', 'admin')->get();
-        Notification::send($admins, new AssetLoanNotification($loan, 'returned', 'Unit aset ' . $loan->asset->asset_name . ' telah dikembalikan oleh ' . Auth::user()->name));
+        $managers = User::whereIn('role', ['admin', 'supervisor'])->get();
+        Notification::send($managers, new AssetLoanNotification($loan, 'returned', 'Unit aset ' . $loan->asset->asset_name . ' telah dikembalikan oleh ' . Auth::user()->name));
 
         return back()->with('success', 'Aset berhasil dikembalikan.');
+    }
+
+    /**
+     * Cancel a pending loan request
+     */
+    public function cancel(AssetLoan $loan)
+    {
+        // Only the user who created it (or admin) can cancel it
+        if ($loan->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Can only cancel pending loans
+        if ($loan->status !== 'pending') {
+            return back()->with('error', 'Hanya pengajuan dengan status Menunggu yang dapat dibatalkan.');
+        }
+
+        // Log the cancellation if activity log is setup (optional, relying on model events if any)
+        
+        $loan->delete();
+
+        return back()->with('success', 'Pengajuan peminjaman berhasil dibatalkan.');
     }
 
     /**

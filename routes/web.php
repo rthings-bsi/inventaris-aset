@@ -45,12 +45,17 @@ Route::middleware('auth')->group(function () {
 	// Loans
 	Route::middleware('permission:loan.view')->get('loans', [\App\Http\Controllers\AssetLoanController::class, 'index'])->name('loans.index');
 	
-	Route::middleware('permission:loan.manage')->group(function () {
+	Route::middleware('permission:loan.create')->group(function () {
 		Route::get('loans/create', [\App\Http\Controllers\AssetLoanController::class, 'create'])->name('loans.create');
 		Route::post('loans', [\App\Http\Controllers\AssetLoanController::class, 'store'])->name('loans.store');
+	});
+
+	Route::post('loans/{loan}/return', [\App\Http\Controllers\AssetLoanController::class, 'return'])->name('loans.return');
+	Route::post('loans/{loan}/cancel', [\App\Http\Controllers\AssetLoanController::class, 'cancel'])->name('loans.cancel');
+
+	Route::middleware('permission:loan.manage')->group(function () {
 		Route::post('loans/{loan}/approve', [\App\Http\Controllers\AssetLoanController::class, 'approve'])->name('loans.approve');
 		Route::post('loans/{loan}/reject', [\App\Http\Controllers\AssetLoanController::class, 'reject'])->name('loans.reject');
-		Route::post('loans/{loan}/return', [\App\Http\Controllers\AssetLoanController::class, 'return'])->name('loans.return');
 		Route::post('assets/{asset}/pinjam', [\App\Http\Controllers\AssetLoanController::class, 'pinjam'])->name('assets.pinjam');
 		Route::post('assets/{asset}/kembali', [\App\Http\Controllers\AssetLoanController::class, 'kembalikan'])->name('assets.kembali');
 	});

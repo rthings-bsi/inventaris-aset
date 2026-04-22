@@ -117,6 +117,15 @@
                                 </form>
                             @endif
                             
+                            @if($loan->status == 'pending' && auth()->id() == $loan->user_id)
+                                <form action="{{ route('loans.cancel', $loan) }}" method="POST">
+                                    @csrf
+                                    <button type="button" onclick="handleLoanAction(this, 'Batalkan', 'Pengajuan peminjaman ini akan dibatalkan secara permanen.', 'warning')" class="w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-500 hover:text-white border border-gray-200 shadow-sm transition-all flex items-center justify-center text-sm" title="Batalkan Pengajuan">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            @endif
+                            
                             @if($loan->status == 'borrowed' && (auth()->user()->hasPermission('loan.manage') || auth()->id() == $loan->user_id))
                                 <form action="{{ route('loans.return', $loan) }}" method="POST">
                                     @csrf
@@ -207,6 +216,15 @@
                         @csrf
                         <button type="button" onclick="handleLoanAction(this, 'Setujui', 'Persetujuan peminjaman aset ini akan diproses.', 'success')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Setujui">
                             <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                @endif
+                
+                @if($loan->status == 'pending' && (auth()->check() && auth()->id() == $loan->user_id))
+                    <form action="{{ route('loans.cancel', $loan) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="button" onclick="handleLoanAction(this, 'Batalkan', 'Pengajuan peminjaman ini akan dibatalkan secara permanen.', 'warning')" class="px-4 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-500 hover:text-white border border-gray-200 shadow-sm transition-all flex items-center justify-center text-xs font-bold gap-1" title="Batalkan Pengajuan">
+                            <i class="fas fa-trash-alt"></i> Batalkan
                         </button>
                     </form>
                 @endif

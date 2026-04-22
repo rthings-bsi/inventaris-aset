@@ -14,7 +14,7 @@ class AssetImport implements ToCollection, WithHeadingRow
     {
         foreach ($rows as $row) {
             // Require at least a code and name to create an asset
-            if (!isset($row['asset_code']) || !isset($row['asset_name'])) {
+            if (empty($row['asset_code']) || empty($row['asset_name'])) {
                 continue;
             }
 
@@ -55,17 +55,27 @@ class AssetImport implements ToCollection, WithHeadingRow
             }
 
             // Update or create the record in the database
+            $rawCondition = trim($row['condition'] ?? 'Baik');
+            $conditionMap = [
+                'good' => 'Baik',
+                'excellent' => 'Baik Sekali',
+                'broken' => 'Rusak',
+                'maintenance' => 'Kurang Baik'
+            ];
+            $condition = $conditionMap[strtolower($rawCondition)] ?? $rawCondition;
+
             Asset::updateOrCreate(
                 ['asset_code' => $row['asset_code']], // Atribut pencarian (unik)
                 [
                     'asset_name'         => $row['asset_name'],
                     'category_id'       => $category->id,
-                    'condition'           => $row['condition'] ?? 'Baik',
+                    'condition'           => $condition,
                     'status'            => strtolower($row['status'] ?? 'active'),
                     'location_id'       => $location->id,
                     'acquisition_cost'   => is_numeric($row['acquisition_cost'] ?? null) ? $row['acquisition_cost'] : 0,
                     'acquisition_date' => $tanggal ?? now(),
-                    'user_id'           => $userId,
+                    'user_id'           => null, // Ensure available for borrowing by default when imported
+                    'person_in_charge'  => $row['person_in_charge'] ?? null,
                     'description'         => $row['description'] ?? null,
                 ]
             );
