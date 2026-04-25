@@ -241,6 +241,13 @@
                 margin: 0.35rem 0 !important;
             }
         }
+        /* AsetKu Branding Styles */
+        .logo-hexagon {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+        .logo-a-shape {
+            clip-path: polygon(50% 0%, 0% 100%, 30% 100%, 50% 40%, 70% 100%, 100% 100%);
+        }
     </style>
 </head>
 <body class="h-screen flex overflow-hidden font-sans antialiased selection:bg-indigo-200 selection:text-indigo-900 group/body">
@@ -344,13 +351,20 @@
         </button>
 
         <!-- Logo -->
-        <a href="{{ route('dashboard') }}" class="h-24 flex items-center px-6 gap-4 group/logo border-b border-indigo-50/50 overflow-hidden whitespace-nowrap mt-2">
-            <div class="w-12 h-12 flex-shrink-0 bg-gradient-to-tr from-indigo-500 via-purple-500 to-indigo-600 bg-[length:200%_200%] animate-gradient-shift rounded-2xl flex items-center justify-center text-white transition-all duration-300 group-hover/logo:scale-110 group-hover/logo:rotate-[15deg] shadow-lg shadow-indigo-200/50">
-                <i class="fas fa-layer-group text-xl group-hover/logo:animate-jelly"></i>
+        <a href="{{ route('dashboard') }}" class="h-28 flex items-center pl-0 pr-6 gap-0 group/logo border-b border-indigo-50/50 overflow-hidden whitespace-nowrap mt-2">
+            <div class="relative w-40 h-40 -ml-14 flex-shrink-0 group-hover/logo:scale-105 transition-all duration-500 ease-out">
+                <img src="{{ asset('logo.png') }}" alt="AsetKu Logo" class="w-full h-full object-contain object-left scale-125 transform origin-left">
             </div>
-            <div class="sidebar-text transition-opacity duration-300">
-                <h1 class="text-2xl font-black text-gray-800 tracking-tight leading-none group-hover/logo:text-indigo-600 transition-colors">Aset<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Ku</span></h1>
-                <p class="text-[9px] text-gray-400 font-black mt-1.5 uppercase tracking-widest group-hover/logo:text-indigo-400 transition-colors">Enterprise System</p>
+            <div class="sidebar-text -ml-6 transition-all duration-300">
+                <h1 class="text-2xl font-black text-slate-800 tracking-tighter leading-none flex items-baseline">
+                    <span class="relative">
+                        A
+                        <span class="absolute -bottom-1 left-0 w-full h-[3px] bg-sky-400 rounded-full opacity-0 group-hover/logo:opacity-100 transition-opacity duration-300"></span>
+                    </span>
+                    <span>set</span>
+                    <span class="text-indigo-600 transition-colors group-hover/logo:text-violet-600">Ku</span>
+                </h1>
+                <p class="text-[8px] text-slate-400 font-extrabold mt-1.5 uppercase tracking-[0.2em] group-hover/logo:text-indigo-400 transition-colors">Enterprise System</p>
             </div>
         </a>
 

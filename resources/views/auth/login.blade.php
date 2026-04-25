@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masuk - Basecamp Aset</title>
+    <title>Masuk - AsetKu</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -202,6 +202,13 @@
             transform: translateY(-10px) translateX(5px) rotate(15deg);
         }
 
+        /* AsetKu Branding Styles */
+        .logo-hexagon {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+        .logo-a-shape {
+            clip-path: polygon(50% 0%, 0% 100%, 30% 100%, 50% 40%, 70% 100%, 100% 100%);
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen relative text-slate-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -239,12 +246,21 @@
         <!-- Glassmorphism Card -->
         <div class="bg-white/70 backdrop-blur-xl py-10 px-6 sm:px-10 shadow-2xl sm:rounded-[2.5rem] border border-white/60 relative">
             
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 mb-4">
-                    <i class="ri-box-3-fill text-2xl"></i>
+            <div class="text-center mb-10">
+                <div class="inline-flex relative w-32 h-32 mb-6 group/logo transition-transform duration-500 hover:scale-110">
+                    <img src="{{ asset('logo.png') }}" alt="AsetKu Logo" class="w-full h-full object-contain">
                 </div>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Basecamp Aset</h2>
-                <p class="mt-2 text-sm text-slate-500 font-medium">Masuk untuk mengelola inventaris cerdas Anda.</p>
+
+                <h1 class="text-4xl font-black text-slate-800 tracking-tighter leading-none flex items-baseline justify-center mb-2">
+                    <span class="relative group/text">
+                        A
+                        <span class="absolute -bottom-1 left-0 w-full h-[4px] bg-sky-400 rounded-full"></span>
+                    </span>
+                    <span>set</span>
+                    <span class="text-indigo-600 transition-colors">Ku</span>
+                </h1>
+                <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-[0.3em]">Enterprise System</p>
+                <p class="mt-4 text-sm text-slate-500 font-medium">Masuk untuk mengelola inventaris cerdas Anda.</p>
             </div>
 
             <!-- Error handling from Laravel -->
