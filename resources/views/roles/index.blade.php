@@ -3,21 +3,30 @@
 @section('title', 'Manajemen Role - Inventaris')
 
 @section('content')
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 animate-pulse pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
+<x-page-header 
+    title="Master Hak Akses" 
+    subtitle="Definisikan batasan akses dan wewenang untuk setiap grup pengguna." 
+    emoji="🛡️" 
+/>
 
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Manajemen Role</span> 🛡️
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl border-l-[3px] border-indigo-200 pl-4">Definisikan peran dan tanggung jawab baru dalam sistem.</p>
-        </div>
-        <a href="{{ route('roles.create') }}" class="group relative inline-flex items-center justify-center px-6 py-3.5 text-sm font-black text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-[0_10px_25px_rgba(79,70,229,0.35)] hover:shadow-[0_15px_35px_rgba(79,70,229,0.45)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-indigo-300 border border-transparent whitespace-nowrap">
-            <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300 text-lg"></i> Tambah Role Baru
-        </a>
+<!-- Add Role Action Row -->
+<div class="mb-5 relative z-30 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+    <!-- Search Section -->
+    <div class="w-full sm:w-80">
+        <form method="GET" action="{{ route('roles.index') }}" class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-300 group-focus-within:text-indigo-400 transition-colors"></i>
+            </div>
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Cari role..." 
+                   class="w-full pl-11 pr-4 py-3 bg-white/60 backdrop-blur-md border border-white hover:border-indigo-100 rounded-xl text-sm font-bold text-gray-700 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 outline-none transition-all shadow-sm">
+        </form>
     </div>
+
+    <!-- Add Button -->
+    <a href="{{ route('roles.create') }}" class="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-[14px] font-black text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-[0_10px_25px_rgba(79,70,229,0.35)] hover:shadow-[0_15px_35px_rgba(79,70,229,0.45)] hover:-translate-y-1 border border-white/20 whitespace-nowrap">
+        <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300 text-lg"></i> Tambah Role Baru
+    </a>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -45,8 +54,8 @@
             <div class="text-[11px] font-bold text-gray-400">
                 Slug: <span class="font-mono text-indigo-400">{{ $role->slug }}</span>
             </div>
-            <div class="flex gap-2">
-                <a href="{{ route('roles.edit', $role) }}" class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm hover:rotate-6">
+            <div class="flex items-center justify-end gap-2">
+                <a href="{{ route('roles.edit', $role) }}" class="w-9 h-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm hover:rotate-6" title="Edit Role">
                     <i class="fas fa-edit text-sm"></i>
                 </a>
                 @if(!in_array($role->slug, ['admin', 'staff']))

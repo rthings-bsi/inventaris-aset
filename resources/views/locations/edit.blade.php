@@ -3,26 +3,17 @@
 @section('title', 'Edit Location - Inventaris')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-    }
-</style>
-
-<div class="relative glass-header rounded-[2rem] p-8 mb-8 border-2 border-white shadow-sm">
-    <div class="relative z-10">
-        <a href="{{ route('locations.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-sm font-black transition-all shadow-sm border border-indigo-50 mb-4 group/back">
-            <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Daftar Location
+<x-page-header 
+    title="Edit Location" 
+    subtitle="Perbarui informasi titik penempatan aset untuk akurasi data inventaris." 
+    emoji="📝"
+>
+    <x-slot name="actions">
+        <a href="{{ route('locations.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-sm font-black transition-all shadow-sm border border-indigo-50 group/back">
+            <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Daftar
         </a>
-        <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Edit Location 📝</h1>
-    </div>
-</div>
+    </x-slot>
+</x-page-header>
 
 <div class="glass-card rounded-[2rem] p-8 border-t-2 border-l-2 border-white/80 shadow-sm relative overflow-hidden text-gray-800">
     <form action="{{ route('locations.update', $location) }}" method="POST">

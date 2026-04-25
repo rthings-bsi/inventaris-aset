@@ -3,54 +3,24 @@
 @section('title', 'Detail Aset - Inventaris')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-
-</style>
-
-<!-- Page Header -->
-<div class="relative glass-header rounded-[2rem] p-5 sm:p-8 md:p-10 mb-6 sm:mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full animate-fade-in-up">
-        <a href="{{ route('assets.index') }}" class="inline-flex items-center text-xs font-black tracking-widest uppercase text-indigo-400 hover:text-indigo-600 mb-4 transition-colors group/back">
-            <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Rekap
-        </a>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 sm:gap-6">
-            <div class="w-full">
-                <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Detail Informasi Aset</span> <span class="text-2xl sm:text-3xl flex-shrink-0">🔍</span>
-                </h1>
-                <p class="text-gray-600 mt-2 font-semibold text-sm sm:text-lg max-w-xl border-l-[3px] border-indigo-200 pl-3 sm:border-none sm:pl-0">Spesifikasi dan riwayat data untuk <span class="text-indigo-600 font-bold border-b border-indigo-200">{{ $asset->asset_name }}</span>.</p>
-            </div>
+<x-page-header 
+    title="Detail Informasi Aset" 
+    subtitle="Spesifikasi dan riwayat data untuk {!! $asset->asset_name !!}." 
+    emoji="🔍"
+>
+    <x-slot name="actions">
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ route('assets.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-xs font-black transition-all shadow-sm border border-indigo-50 group/back">
+                <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Rekap
+            </a>
             @if(auth()->check() && auth()->user()->hasPermission('asset.edit'))
-            <div class="flex gap-3 w-full sm:w-auto mt-2 sm:mt-0">
-                <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center px-6 sm:px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-black shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_15px_30px_-10px_rgba(79,70,229,0.7)] hover:-translate-y-1 transition-all group/btn w-full justify-center border border-transparent text-sm sm:text-base">
-                    <i class="fas fa-magic mr-2 group-hover/btn:rotate-12 transition-transform"></i> Modifikasi Data
+                <a href="{{ route('assets.edit', $asset) }}" class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl text-xs font-black shadow-md hover:-translate-y-1 transition-all group/edit border border-transparent">
+                    <i class="fas fa-magic mr-2 group/edit:rotate-12 transition-transform"></i> Modifikasi Data
                 </a>
-            </div>
             @endif
         </div>
-    </div>
-</div>
+    </x-slot>
+</x-page-header>
 
 <!-- Main Grid -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -284,7 +254,7 @@
                             </button>
                         </div>
                         <div id="print-qr-area" class="bg-white p-4 rounded-2xl border border-indigo-100 shadow-[0_4px_15px_rgba(0,0,0,0.05)] group-hover/item:scale-105 transition-transform flex flex-col items-center justify-center gap-3">
-                            {!! QrCode::size(100)->color(79, 70, 229)->generate(route('assets.show', $asset->id)) !!}
+                            {!! QrCode::size(100)->color(79, 70, 229)->generate(route('assets.show', $asset->id_assets)) !!}
                             <span class="text-[10px] font-black uppercase tracking-widest text-indigo-500 border-t border-dashed border-indigo-100 pt-2 w-full text-center">{{ $asset->asset_code }}</span>
                         </div>
                     </div>
@@ -337,7 +307,7 @@
                             <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-exchange-alt text-indigo-300"></i> Sistem Serah Terima (Check-in/Check-out)
                             </p>
-                            @if($asset->user_id)
+                            @if($asset->id_users)
                                 <span class="bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1.5 border border-amber-200">
                                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Sedang Dipinjam
                                 </span>
@@ -357,7 +327,7 @@
                             @endif
                         </div>
 
-                        @if($asset->user_id)
+                        @if($asset->id_users)
                             <!-- Tampilan Sedang Dipinjam -->
                             <div class="flex flex-col sm:flex-row items-center gap-4 bg-white p-4 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden">
                                 <div class="absolute right-0 top-0 bottom-0 w-2 bg-amber-400"></div>

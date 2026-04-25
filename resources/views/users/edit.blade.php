@@ -2,15 +2,17 @@
 @section('title', 'Edit User - AsetKu')
 
 @section('content')
-<div class="mb-8 flex items-center gap-4">
-    <a href="{{ route('users.index') }}" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 shadow-sm transition-all hover:scale-105 border border-white">
-        <i class="fas fa-arrow-left"></i>
-    </a>
-    <div>
-        <h1 class="text-2xl font-black text-gray-800 tracking-tight">Kustomisasi <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Profil User</span></h1>
-        <p class="text-sm font-bold text-gray-500 mt-0.5">Edit detail akun, role, dan password.</p>
-    </div>
-</div>
+<x-page-header 
+    title="Kustomisasi Profil User" 
+    subtitle="Edit detail akun, role, dan kredensial keamanan pengguna." 
+    emoji="👤"
+>
+    <x-slot name="actions">
+        <a href="{{ route('users.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-sm font-black transition-all shadow-sm border border-indigo-50 group/back">
+            <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Daftar User
+        </a>
+    </x-slot>
+</x-page-header>
 
 <div class="bg-white/60 backdrop-blur-xl border border-white rounded-[2rem] p-6 md:p-8 shadow-sm max-w-2xl">
     <form action="{{ route('users.update', $user) }}" method="POST" class="space-y-6">
@@ -55,7 +57,7 @@
                     <i class="fas fa-chevron-down text-xs"></i>
                 </div>
             </div>
-            @if(auth()->id() === $user->id)
+            @if(auth()->id() === $user->id_users)
                 <p class="text-amber-500 text-xs font-bold mt-1"><i class="fas fa-exclamation-triangle"></i> Peringatan: Anda sedang mengubah role Anda sendiri.</p>
             @endif
             @error('role') <p class="text-rose-500 text-xs font-bold flex items-center"><i class="fas fa-exclamation-circle mr-1"></i> {{ $message }}</p> @enderror

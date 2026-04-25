@@ -3,28 +3,11 @@
 @section('title', 'Hak Akses Role - Inventaris')
 
 @section('content')
-<div class="mb-8 p-8 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border-2 border-white rounded-[2rem] shadow-sm relative overflow-hidden group">
-    <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-    <div class="relative z-10">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-                <div class="flex items-center gap-4 mb-3">
-                    <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm border border-indigo-50 group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
-                        <i class="fas fa-user-shield text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl font-black text-gray-800 tracking-tight">Otorisasi & <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Kontrol</span></h1>
-                        <p class="text-sm font-bold text-gray-500 mt-1 uppercase tracking-widest"><i class="fas fa-shield-alt text-indigo-400 mr-1"></i> Admin Area</p>
-                    </div>
-                </div>
-                <p class="text-gray-600 max-w-2xl font-medium leading-relaxed">
-                    Konfigurasi granular untuk setiap peran pengguna di ekosistem AsetKu.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+<x-page-header 
+    title="Otorisasi & Kontrol" 
+    subtitle="Konfigurasi granular untuk setiap peran pengguna di ekosistem AsetKu." 
+    emoji="🛡️"
+/>
 
 <form action="{{ route('settings.roles.update') }}" method="POST" id="permissions-form">
     @csrf

@@ -3,41 +3,11 @@
 @section('title', 'Data Category - Inventaris')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-</style>
-
-<!-- Header Section -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Data Category</span> 🏷️
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl">Kelola category aset Anda di sini.</p>
-        </div>
-    </div>
-</div>
+<x-page-header 
+    title="Data Category" 
+    subtitle="Kelola category aset Anda di sini." 
+    emoji="🏷️" 
+/>
 
 <!-- Search -->
 <div class="mb-5 relative z-30 flex items-center justify-between gap-4 w-full">

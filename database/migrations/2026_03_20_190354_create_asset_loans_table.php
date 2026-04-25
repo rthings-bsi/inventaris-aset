@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asset_loans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('asset_id')->constrained()->cascadeOnDelete();
+            $table->id('id_asset_loans');
+            $table->foreignId('id_assets')->constrained('assets', 'id_assets')->cascadeOnDelete();
             $table->string('borrower');
             $table->timestamp('loan_date');
             $table->timestamp('return_date')->nullable();

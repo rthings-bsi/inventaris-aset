@@ -3,69 +3,22 @@
 @section('title', 'Pemindaian Audit - ' . $audit->title)
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-    
-    #reader video {
-        object-fit: cover !important;
-        border-radius: 2rem;
-    }
-    #reader__scan_region { border: none !important; }
-    #reader img { display: none !important; }
-    #reader__dashboard_section_csr button {
-        background: #4F46E5 !important;
-        color: white !important;
-        border-radius: 1rem !important;
-        padding: 10px 20px !important;
-        font-family: inherit !important;
-        font-weight: 800 !important;
-        text-transform: uppercase !important;
-        border: none !important;
-        font-size: 11px !important;
-        letter-spacing: 1px !important;
-    }
-</style>
-
-<!-- Page Header -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <a href="{{ route('audits.index') }}" class="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-600 transition-colors mb-4">
-                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-                Kembali ke Daftar
+<x-page-header 
+    title="Sesi Audit: {!! $audit->title !!}" 
+    subtitle="Pindai barcode pada aset fisik untuk validasi stok lapangan." 
+    emoji="🛡️"
+>
+    <x-slot name="actions">
+        <div class="flex flex-col md:flex-row gap-3">
+            <a href="{{ route('audits.index') }}" class="group inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm border border-indigo-50">
+                <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Kembali
             </a>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-                Sesi Audit: <span class="text-indigo-600 font-black">{{ $audit->title }}</span>
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Pindai barcode pada aset fisik untuk validasi stok lapangan.
-            </p>
+            <button onclick="confirmComplete()" class="group relative inline-flex items-center justify-center px-6 py-2 text-[11px] font-black uppercase tracking-widest text-white transition-all duration-300 bg-emerald-600 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95 border border-transparent">
+                <i class="fas fa-check-double mr-2 group-hover:scale-110 transition-transform"></i> Selesaikan Audit
+            </button>
         </div>
-        <button onclick="confirmComplete()" class="group relative inline-flex items-center justify-center px-8 py-4 text-[14px] font-black text-white transition-all duration-300 bg-emerald-600 rounded-2xl shadow-[0_10px_25px_rgba(16,185,129,0.35)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.45)] hover:-translate-y-1 active:scale-95 border border-transparent">
-            <i class="fas fa-check-double mr-2 group-hover:scale-110 transition-transform"></i>
-            Selesaikan Audit
-        </button>
-    </div>
-</div>
+    </x-slot>
+</x-page-header>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
     <!-- Scanner Side -->

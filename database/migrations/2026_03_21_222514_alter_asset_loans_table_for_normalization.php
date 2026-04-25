@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('asset_loans', function (Blueprint $table) {
             $table->dropColumn('borrower');
-            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->foreignId('id_users')->nullable()->constrained('users', 'id_users')->cascadeOnDelete();
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('asset_loans', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+            $table->dropForeign(['id_users']);
+            $table->dropColumn('id_users');
             $table->string('borrower');
         });
     }

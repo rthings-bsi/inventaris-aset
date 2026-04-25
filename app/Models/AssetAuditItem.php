@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetAuditItem extends Model
 {
-    protected $fillable = ['asset_audit_id', 'asset_id', 'scanned_code', 'status', 'notes', 'scanned_at'];
+    protected $primaryKey = 'id_asset_audit_items';
+
+    protected $fillable = ['id_asset_audits', 'id_assets', 'scanned_code', 'status', 'notes', 'scanned_at'];
 
     protected $casts = [
         'scanned_at' => 'datetime',
@@ -14,11 +16,11 @@ class AssetAuditItem extends Model
 
     public function audit()
     {
-        return $this->belongsTo(AssetAudit::class, 'asset_audit_id');
+        return $this->belongsTo(AssetAudit::class, 'id_asset_audits');
     }
 
     public function asset()
     {
-        return $this->belongsTo(Asset::class);
+        return $this->belongsTo(Asset::class, 'id_assets');
     }
 }

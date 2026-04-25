@@ -40,8 +40,8 @@ class AssetLoanNotification extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'loan_id' => $this->loan->id,
-            'asset_id' => $this->loan->asset_id,
+            'loan_id' => $this->loan->id_asset_loans,
+            'asset_id' => $this->loan->id_assets,
             'asset_name' => $this->loan->asset->asset_name,
             'message' => $this->message,
             'type' => $this->type,

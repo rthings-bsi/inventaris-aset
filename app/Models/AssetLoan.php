@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetLoan extends Model
 {
+    protected $primaryKey = 'id_asset_loans';
+
     protected $fillable = [
-        'asset_id',
-        'user_id',
+        'id_assets',
+        'id_users',
         'loan_date',
         'return_date',
         'status',
@@ -22,11 +24,11 @@ class AssetLoan extends Model
 
     public function asset()
     {
-        return $this->belongsTo(Asset::class)->withTrashed();
+        return $this->belongsTo(Asset::class, 'id_assets', 'id_assets')->withTrashed();
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_users', 'id_users');
     }
 }

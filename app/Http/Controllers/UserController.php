@@ -12,10 +12,22 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         abort_if(!auth()->user()->hasPermission('user.manage'), 403, 'Anda tidak memiliki otorisasi untuk mengakses manajemen pengguna.');
-        $users = User::latest()->paginate(10);
+        
+        $query = User::latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $users = $query->paginate(10)->withQueryString();
+        
         return view('users.index', compact('users'));
     }
 
@@ -72,7 +84,7 @@ class UserController extends Controller
         abort_if(!auth()->user()->hasPermission('user.manage'), 403, 'Anda tidak memiliki otorisasi untuk mengakses manajemen pengguna.');
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id_users, 'id_users')],
             'role' => ['required', 'string', 'exists:roles,slug'],
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -98,7 +110,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         abort_if(!auth()->user()->hasPermission('user.manage'), 403, 'Anda tidak memiliki otorisasi untuk mengakses manajemen pengguna.');
-        if (auth()->id() === $user->id) {
+        if (auth()->id() === $user->id_users) {
             return redirect()->route('users.index')->with('error', 'Tidak dapat menghapus akun Anda sendiri.');
         }
 

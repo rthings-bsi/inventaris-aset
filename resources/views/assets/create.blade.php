@@ -3,50 +3,17 @@
 @section('title', 'Tambah Aset - Inventaris')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-</style>
-
-<!-- Header Section -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <a href="{{ route('assets.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-sm font-black transition-all shadow-sm border border-indigo-50 mb-4 group/back">
-                <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Inventaris
-            </a>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700 tracking-tight flex items-center gap-3">
-                Tambah Entri Baru ✨
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl">Silakan lengkapi formulir di bawah ini untuk mencatat aset baru ke dalam sistem.</p>
-        </div>
-        
-        <div class="hidden md:flex">
-             <div class="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center border-2 border-indigo-50 text-indigo-500 transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-500">
-                  <i class="fas fa-box-open text-2xl group-hover:animate-bounce-sm"></i>
-             </div>
-        </div>
-    </div>
-</div>
+<x-page-header 
+    title="Tambah Entri Baru" 
+    subtitle="Silakan lengkapi formulir di bawah ini untuk mencatat aset baru ke dalam sistem." 
+    emoji="✨"
+>
+    <x-slot name="actions">
+        <a href="{{ route('assets.index') }}" class="inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-sm font-black transition-all shadow-sm border border-indigo-50 group/back">
+            <i class="fas fa-arrow-left mr-2 group-hover/back:-translate-x-1 transition-transform"></i> Kembali ke Inventaris
+        </a>
+    </x-slot>
+</x-page-header>
 
 <!-- Form Card -->
 <div class="glass-card rounded-[2rem] p-8 md:p-10 mb-10 relative overflow-hidden group/form border-t-2 border-l-2 border-white/80">
@@ -95,18 +62,18 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fas fa-layer-group text-indigo-300 group-hover/input:text-indigo-500 transition-colors"></i>
                     </div>
-                    <select name="category_id" required
-                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('category_id') border-red-300 bg-red-50 focus:border-red-500 @enderror">
+                    <select name="id_categories" required
+                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('id_categories') border-red-300 bg-red-50 focus:border-red-500 @enderror">
                         <option value="">Pilihan Category</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->category_name }}</option>
+                            <option value="{{ $category->id_categories }}" {{ old('id_categories') == $category->id_categories ? 'selected' : '' }}>{{ $category->category_name }}</option>
                         @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-indigo-400">
                         <i class="fas fa-chevron-down text-sm"></i>
                     </div>
                 </div>
-                @error('category_id')
+                @error('id_categories')
                     <p class="text-red-500 text-xs font-bold mt-2 animate-bounce-sm px-1"><i class="fas fa-info-circle mr-1"></i> {{ $message }}</p>
                 @enderror
             </div>
@@ -173,18 +140,18 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fas fa-map-marker-alt text-indigo-300 group-hover/input:text-indigo-500 transition-colors"></i>
                     </div>
-                    <select name="location_id" required
-                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('location_id') border-red-300 bg-red-50 focus:border-red-500 @enderror">
+                    <select name="id_locations" required
+                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('id_locations') border-red-300 bg-red-50 focus:border-red-500 @enderror">
                         <option value="">Pilihan Location</option>
                         @foreach($locations as $location)
-                            <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>{{ $location->location_name }}</option>
+                            <option value="{{ $location->id_locations }}" {{ old('id_locations') == $location->id_locations ? 'selected' : '' }}>{{ $location->location_name }}</option>
                         @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-indigo-400">
                         <i class="fas fa-chevron-down text-sm"></i>
                     </div>
                 </div>
-                @error('location_id')
+                @error('id_locations')
                     <p class="text-red-500 text-xs font-bold mt-2 animate-bounce-sm px-1"><i class="fas fa-info-circle mr-1"></i> {{ $message }}</p>
                 @enderror
             </div>
@@ -219,18 +186,18 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fas fa-user-tie text-indigo-300 group-hover/input:text-indigo-500 transition-colors"></i>
                     </div>
-                    <select name="user_id"
-                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('user_id') border-red-300 bg-red-50 focus:border-red-500 @enderror">
+                    <select name="id_users"
+                            class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('id_users') border-red-300 bg-red-50 focus:border-red-500 @enderror">
                         <option value="">Pilih Penanggung Jawab (Kosongkan jika divisi kolektif)</option>
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{ $user->name }} - {{ $user->email }}</option>
+                            <option value="{{ $user->id_users }}" {{ old('id_users') == $user->id_users ? 'selected' : '' }}>{{ $user->name }} - {{ $user->email }}</option>
                         @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-indigo-400">
                         <i class="fas fa-chevron-down text-sm"></i>
                     </div>
                 </div>
-                @error('user_id')
+                @error('id_users')
                     <p class="text-red-500 text-xs font-bold mt-2 animate-bounce-sm px-1"><i class="fas fa-info-circle mr-1"></i> {{ $message }}</p>
                 @enderror
             </div>

@@ -2,31 +2,35 @@
 @section('title', 'Manajemen User - AsetKu')
 
 @section('content')
-<div class="mb-8 p-8 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 border-2 border-white rounded-[2rem] shadow-sm relative overflow-hidden group">
-    <div class="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-3xl opacity-50 group-hover:scale-110 transition-transform duration-700 pointer-events-none"></div>
-    <div class="relative z-10">
-        <div class="flex items-center gap-4 mb-3">
-            <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shadow-sm border border-indigo-50 group-hover:rotate-3 group-hover:scale-110 transition-all duration-300">
-                <i class="fas fa-users text-xl"></i>
+<x-page-header 
+    title="Manajemen User" 
+    subtitle="Kelola akses staf dan otorisasi. Anda dapat menambahkan akun baru dan mengatur peran." 
+    emoji="👥" 
+/>
+
+<!-- Action Row -->
+<div class="mb-5 relative z-30 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
+    <!-- Search Section -->
+    <div class="w-full sm:w-80">
+        <form method="GET" action="{{ route('users.index') }}" class="relative group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-300 group-focus-within:text-indigo-400 transition-colors"></i>
             </div>
-            <div>
-                <h1 class="text-3xl font-black text-gray-800 tracking-tight">Manajemen <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">User</span></h1>
-                <p class="text-sm font-bold text-gray-500 mt-1 uppercase tracking-widest"><i class="fas fa-shield-alt text-indigo-400 mr-1"></i> Admin Area</p>
-            </div>
-        </div>
-        <p class="text-gray-600 max-w-2xl font-medium leading-relaxed">
-            Kelola akses staf dan otorisasi. Anda dapat menambah akun baru, mengatur peran (role), dan memodifikasi profil serta kredensial mereka.
-        </p>
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Cari nama atau email..." 
+                   class="w-full pl-11 pr-4 py-3 bg-white/60 backdrop-blur-md border border-white hover:border-indigo-100 rounded-xl text-sm font-bold text-gray-700 focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 outline-none transition-all shadow-sm">
+        </form>
     </div>
+
+    <!-- Add Button -->
+    <a href="{{ route('users.create') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black text-sm rounded-xl hover:shadow-[0_8px_25px_rgba(79,70,229,0.4)] hover:-translate-y-1 transition-all border border-white/20 group">
+        <i class="fas fa-plus-circle group-hover:rotate-90 transition-transform"></i> Tambah User Baru
+    </a>
 </div>
 
 <div class="bg-white/60 backdrop-blur-xl border border-white rounded-[2rem] p-6 shadow-sm mb-6 relative z-20">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div class="mb-6">
         <h2 class="text-lg font-black text-gray-800"><i class="fas fa-list-ul text-indigo-500 mr-2"></i>Daftar Pengguna Sistem</h2>
-        <a href="{{ route('users.create') }}" class="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-sm rounded-xl hover:shadow-[0_8px_25px_rgba(79,70,229,0.4)] hover:-translate-y-1 transition-all">
-            <i class="fas fa-plus"></i> Tambah User Baru
-        </a>
     </div>
 
     <div class="overflow-x-auto rounded-2xl border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] hidden md:block">
@@ -61,23 +65,25 @@
                     <td class="p-4 text-sm text-gray-500 font-medium">
                         {{ $user->created_at->format('d M Y') }}
                     </td>
-                    <td class="p-4 text-right space-x-2">
-                        <a href="{{ route('users.edit', $user) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm" title="Edit Profile/Role">
-                            <i class="fas fa-pen text-xs"></i>
-                        </a>
-                        @if(auth()->id() !== $user->id)
-                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" onclick="confirmDelete(this, 'User')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 border border-gray-100 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all hover:scale-110 hover:rotate-12 shadow-sm" title="Hapus Permanen">
-                                    <i class="fas fa-trash-alt text-sm"></i>
+                    <td class="p-4">
+                        <div class="flex items-center justify-end gap-2 transition-all duration-300">
+                            <a href="{{ route('users.edit', $user) }}" class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm" title="Edit Profile/Role">
+                                <i class="fas fa-pen text-xs"></i>
+                            </a>
+                            @if(auth()->id() !== $user->id_users)
+                                <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" onclick="confirmDelete(this, 'User')" class="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-50 border border-gray-100 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all hover:scale-110 hover:rotate-12 shadow-sm" title="Hapus Permanen">
+                                        <i class="fas fa-trash-alt text-sm"></i>
+                                    </button>
+                                </form>
+                            @else
+                                <button disabled class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gray-50 text-gray-300 cursor-not-allowed shadow-sm" title="Tidak dapat menghapus diri sendiri">
+                                    <i class="fas fa-ban text-xs"></i>
                                 </button>
-                            </form>
-                        @else
-                            <button disabled class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-300 cursor-not-allowed shadow-sm" title="Tidak dapat menghapus diri sendiri">
-                                <i class="fas fa-ban text-xs"></i>
-                            </button>
-                        @endif
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @empty
@@ -121,7 +127,7 @@
                 <a href="{{ route('users.edit', $user) }}" class="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-xl text-xs font-bold transition-colors">
                     <i class="fas fa-pen"></i> Edit
                 </a>
-                @if(auth()->id() !== $user->id)
+                @if(auth()->id() !== $user->id_users)
                     <form action="{{ route('users.destroy', $user) }}" method="POST" class="flex-1" onsubmit="return confirm('Hapus secara permanen?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 bg-rose-50 text-rose-600 hover:bg-rose-500 hover:text-white rounded-xl text-xs font-bold transition-colors">

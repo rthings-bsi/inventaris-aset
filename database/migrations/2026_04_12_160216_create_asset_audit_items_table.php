@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asset_audit_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('asset_audit_id')->constrained('asset_audits')->onDelete('cascade');
-            $table->foreignId('asset_id')->nullable()->constrained('assets')->onDelete('cascade');
+            $table->id('id_asset_audit_items');
+            $table->foreignId('id_asset_audits')->constrained('asset_audits', 'id_asset_audits')->onDelete('cascade');
+            $table->foreignId('id_assets')->nullable()->constrained('assets', 'id_assets')->onDelete('cascade');
             $table->string('scanned_code'); // what was actually scanned
             $table->string('status')->nullable(); // present, damaged, etc.
             $table->text('notes')->nullable();

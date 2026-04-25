@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('asset_audits', function (Blueprint $table) {
-            $table->id();
+            $table->id('id_asset_audits');
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('audit_date');
             $table->string('status')->default('open'); // open, completed
-            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->nullable()->constrained('users', 'id_users');
             $table->timestamps();
         });
     }

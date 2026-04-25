@@ -3,39 +3,11 @@
 @section('title', 'Direktori Aset - Inventaris')
 
 @section('content')
-<style>
-    @keyframes blob {
-        0% { transform: translate(0px, 0px) scale(1); }
-        33% { transform: translate(30px, -50px) scale(1.1); }
-        66% { transform: translate(-20px, 20px) scale(0.9); }
-        100% { transform: translate(0px, 0px) scale(1); }
-    }
-    .animate-blob {
-        animation: blob 7s infinite;
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-</style>
-
-<!-- Header Section -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight flex items-center gap-3">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Direktori Aset</span> 📦
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl">Pusat inventarisasi dan pemantauan seluruh aset perusahaan.</p>
-        </div>
-
-    </div>
-</div>
+<x-page-header 
+    title="Direktori Aset" 
+    subtitle="Kelola aset operasional Anda dengan transparansi dan efisiensi maksimal." 
+    emoji="📦" 
+/>
 
 <!-- Filter & Search Container and Add Asset Action -->
 <div class="mb-5 relative z-30 flex flex-row items-center justify-between gap-2 sm:gap-4 w-full">
@@ -98,7 +70,7 @@
                             <select name="category" class="w-full px-5 py-3.5 bg-gray-50/50 border border-gray-100 rounded-2xl text-[13px] font-bold text-gray-600 hover:bg-white focus:bg-white focus:ring-4 focus:ring-indigo-50 focus:border-indigo-200 transition-all appearance-none outline-none cursor-pointer">
                                 <option value="">Semua Kategori</option>
                                 @foreach($categories as $cat)
-                                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->category_name }}</option>
+                                <option value="{{ $cat->id_categories }}" {{ request('category') == $cat->id_categories ? 'selected' : '' }}>{{ $cat->category_name }}</option>
                                 @endforeach
                             </select>
                             <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-[10px]"></i>
@@ -191,7 +163,7 @@
                     <th class="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-widest border-b-2 border-dashed border-indigo-100">Penempatan</th>
                     <th class="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-widest border-b-2 border-dashed border-indigo-100">Status</th>
                     <th class="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-widest border-b-2 border-dashed border-indigo-100">Valuasi</th>
-                    <th class="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-widest border-b-2 border-dashed border-indigo-100 text-right">Otorisasi</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-indigo-400 uppercase tracking-widest border-b-2 border-dashed border-indigo-100 text-right">Aksi</th>
                 </tr>
             </thead>
             <tbody class="space-y-2">
@@ -199,7 +171,7 @@
                 <tr class="group hover:bg-white/80 transition-all duration-300 rounded-2xl border-b border-gray-100 hover:shadow-[0_2px_15px_rgba(79,70,229,0.05)] relative">
                     @if(auth()->check() && auth()->user()->hasPermission('asset.bulk-delete'))
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <input type="checkbox" name="asset_ids[]" value="{{ $asset->id }}" class="asset-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer transition-all hover:scale-110">
+                        <input type="checkbox" name="asset_ids[]" value="{{ $asset->id_assets }}" class="asset-checkbox w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer transition-all hover:scale-110">
                     </td>
                     @endif
                     <!-- Kolom Gabungan Info Aset -->
@@ -300,7 +272,7 @@
         <div class="bg-white rounded-[1.25rem] p-4 border border-indigo-50 shadow-[0_5px_15px_-5px_rgba(79,70,229,0.08)] flex flex-col gap-3 relative overflow-hidden group">
             @if(auth()->check() && auth()->user()->hasPermission('asset.bulk-delete'))
             <div class="absolute top-4 left-4 z-10">
-                <input type="checkbox" value="{{ $asset->id }}" class="asset-checkbox w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 cursor-pointer shadow-sm">
+                <input type="checkbox" value="{{ $asset->id_assets }}" class="asset-checkbox w-5 h-5 text-indigo-600 border-gray-300 rounded-lg focus:ring-indigo-500 cursor-pointer shadow-sm">
             </div>
             @endif
             <!-- Header: Photo & Name & Action -->
@@ -477,15 +449,23 @@
                     </p>
                 </div>
 
-                <div id="selection-status" class="mb-4 hidden text-[13px] font-black text-gray-700 flex items-center gap-2">
-                    <span id="selected-count" class="bg-rose-100 text-rose-700 px-3 py-1 rounded-lg">0</span> aset terpilih
+                <div id="selection-status" class="mb-4 hidden">
+                    <div class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl animate-fade-in-up">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-sm">
+                            <i class="fas fa-check-double text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-[12px] font-black text-emerald-800 uppercase tracking-wide">Aset Terpilih</p>
+                            <p class="text-[11px] font-bold text-emerald-600"><span id="selected-count">0</span> item siap untuk dihapus</p>
+                        </div>
+                    </div>
                 </div>
 
                 <form id="bulk-delete-form" action="{{ route('assets.bulkDestroy') }}" method="POST">
                     @csrf
                     @method('DELETE')
                     <div id="bulk-ids-container"></div>
-                    <button type="submit" id="bulk-delete-btn" disabled class="w-full bg-white border-2 border-rose-200 text-rose-400 font-black px-5 py-3.5 rounded-xl transition-all text-[13px] flex items-center justify-center gap-2 cursor-not-allowed grayscale">
+                    <button type="submit" id="bulk-delete-btn" disabled class="w-full bg-gray-50 border-2 border-gray-100 text-gray-400 font-black px-5 py-3.5 rounded-xl transition-all text-[13px] flex items-center justify-center gap-2 cursor-not-allowed">
                         <i class="fas fa-trash-alt"></i> Hapus Aset Terpilih
                     </button>
                 </form>
@@ -552,8 +532,8 @@
 
     // Bulk Delete Logic
     document.addEventListener('DOMContentLoaded', function() {
-        // ... selection logic same as before ...
         const selectAll = document.getElementById('select-all');
+        const selectAllMobile = document.getElementById('select-all-mobile');
         const checkboxes = document.querySelectorAll('.asset-checkbox');
         const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
         const bulkDeleteForm = document.getElementById('bulk-delete-form');
@@ -562,20 +542,24 @@
         const selectionStatus = document.getElementById('selection-status');
 
         function updateBulkButton() {
-            const checkedCount = document.querySelectorAll('.asset-checkbox:checked').length;
+            const checkedBoxes = document.querySelectorAll('.asset-checkbox:checked');
+            // Use a Set to handle potential duplicate IDs if Desktop/Mobile elements exist for same asset
+            const uniqueIds = new Set();
+            checkedBoxes.forEach(cb => uniqueIds.add(cb.value));
+            const checkedCount = uniqueIds.size;
             
             if (bulkDeleteBtn) {
                 if (checkedCount > 0) {
                     bulkDeleteBtn.disabled = false;
-                    bulkDeleteBtn.classList.remove('text-rose-400', 'border-rose-200', 'cursor-not-allowed', 'grayscale');
-                    bulkDeleteBtn.classList.add('bg-rose-600', 'text-white', 'border-rose-600', 'shadow-lg', 'shadow-rose-200', 'hover:-translate-y-1', 'active:scale-95');
-                    selectionStatus.classList.remove('hidden');
-                    selectedCountEl.innerText = checkedCount;
+                    bulkDeleteBtn.classList.remove('bg-gray-50', 'border-gray-100', 'text-gray-400', 'cursor-not-allowed');
+                    bulkDeleteBtn.classList.add('bg-rose-600', 'text-white', 'border-rose-600', 'shadow-lg', 'hover:-translate-y-1', 'active:scale-95');
+                    if (selectionStatus) selectionStatus.classList.remove('hidden');
+                    if (selectedCountEl) selectedCountEl.innerText = checkedCount;
                 } else {
                     bulkDeleteBtn.disabled = true;
-                    bulkDeleteBtn.classList.add('text-rose-400', 'border-rose-200', 'cursor-not-allowed', 'grayscale');
-                    bulkDeleteBtn.classList.remove('bg-rose-600', 'text-white', 'border-rose-600', 'shadow-lg', 'shadow-rose-200', 'hover:-translate-y-1', 'active:scale-95');
-                    selectionStatus.classList.add('hidden');
+                    bulkDeleteBtn.classList.add('bg-gray-50', 'border-gray-100', 'text-gray-400', 'cursor-not-allowed');
+                    bulkDeleteBtn.classList.remove('bg-rose-600', 'text-white', 'border-rose-600', 'shadow-lg', 'hover:-translate-y-1', 'active:scale-95');
+                    if (selectionStatus) selectionStatus.classList.add('hidden');
                 }
             }
         }
@@ -583,37 +567,57 @@
         if (selectAll) {
             selectAll.addEventListener('change', function() {
                 checkboxes.forEach(cb => cb.checked = selectAll.checked);
+                if (selectAllMobile) selectAllMobile.checked = selectAll.checked;
+                updateBulkButton();
+            });
+        }
+
+        if (selectAllMobile) {
+            selectAllMobile.addEventListener('change', function() {
+                checkboxes.forEach(cb => cb.checked = selectAllMobile.checked);
+                if (selectAll) selectAll.checked = selectAllMobile.checked;
                 updateBulkButton();
             });
         }
 
         checkboxes.forEach(cb => {
             cb.addEventListener('change', function() {
+                const totalOnPage = document.querySelectorAll('.asset-checkbox').length;
+                const totalChecked = document.querySelectorAll('.asset-checkbox:checked').length;
+                
+                // Keep selectAll state in sync
                 if (selectAll && !this.checked) selectAll.checked = false;
-                if (selectAll && document.querySelectorAll('.asset-checkbox:checked').length === checkboxes.length) selectAll.checked = true;
+                if (selectAllMobile && !this.checked) selectAllMobile.checked = false;
+                
                 updateBulkButton();
             });
         });
 
+        // Initialize state (in case browser remembers checkboxes on refresh)
+        updateBulkButton();
+
         if (bulkDeleteForm) {
             bulkDeleteForm.addEventListener('submit', function(e) {
-                const checked = document.querySelectorAll('.asset-checkbox:checked');
-                if (checked.length === 0) {
+                const checkedBoxes = document.querySelectorAll('.asset-checkbox:checked');
+                const uniqueIds = new Set();
+                checkedBoxes.forEach(cb => uniqueIds.add(cb.value));
+                
+                if (uniqueIds.size === 0) {
                     e.preventDefault();
                     return;
                 }
                 
                 e.preventDefault();
                 confirmAction({
-                    title: 'Hapus Massal?',
-                    text: 'Seluruh aset terpilih (' + checked.length + ') akan dihapus secara permanen.',
+                    title: 'Konfirmasi Hapus Massal',
+                    text: 'Anda akan menghapus ' + uniqueIds.size + ' aset secara permanen. Tindakan ini tidak dapat dibatalkan.',
                     confirmText: 'Ya, Hapus Semua',
                     icon: 'error'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Show loading state
                         Swal.fire({
-                            title: 'Hapus Massal',
+                            title: 'Sedang Memproses',
                             text: 'Sistem sedang menghapus data terpilih...',
                             allowOutsideClick: false,
                             showConfirmButton: false,
@@ -623,11 +627,11 @@
                         });
 
                         bulkIdsContainer.innerHTML = '';
-                        checked.forEach(cb => {
+                        uniqueIds.forEach(id => {
                             const input = document.createElement('input');
                             input.type = 'hidden';
                             input.name = 'ids[]';
-                            input.value = cb.value;
+                            input.value = id;
                             bulkIdsContainer.appendChild(input);
                         });
                         bulkDeleteForm.submit();

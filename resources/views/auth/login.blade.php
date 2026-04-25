@@ -204,7 +204,7 @@
 
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen relative overflow-hidden text-slate-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+<body class="bg-slate-50 min-h-screen relative text-slate-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
 
     <!-- Ambient / Abstract Background Patterns -->
     <div class="absolute inset-0 bg-grid z-0"></div>

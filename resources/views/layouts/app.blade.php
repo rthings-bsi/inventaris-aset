@@ -98,10 +98,18 @@
         }
 
         .glass-header {
+            background: rgba(255, 255, 0.85);
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.6);
         }
+
+        @keyframes gradientBlob {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, -30px) scale(1.05); }
+            66% { transform: translate(-15px, 15px) scale(0.95); }
+        }
+        .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
         
         /* Smooth transitions */
         a, button, .sidebar-text, div {
@@ -759,9 +767,10 @@
             };
 
             let btnClass = 'swal2-confirm-primary';
-            if (options.icon === 'error') btnClass = 'swal2-confirm-danger';
+            if (options.icon === 'error' || options.variant === 'danger') btnClass = 'swal2-confirm-danger';
             else if (options.icon === 'success') btnClass = 'swal2-confirm-success';
             else if (options.icon === 'warning') btnClass = 'swal2-confirm-warning';
+            else if (options.icon === 'question') btnClass = 'swal2-confirm-danger'; // Usually used for destructive confirmation
 
             return Swal.fire({
                 title: options.title || 'Konfirmasi Tindakan',
@@ -835,11 +844,12 @@
             // Intercept form submissions
             document.addEventListener('submit', (e) => {
                 const form = e.target;
-                if (!form.hasAttribute('target') || form.target !== '_blank') {
-                    if (form.classList && form.classList.contains('no-loader')) return;
-                    if (form.id === 'form-export') return;
-                    showLoader();
-                }
+                // Exclude forms with target="_blank", no-loader class, or specific IDs
+                if (form.hasAttribute('target') && form.target === '_blank') return;
+                if (form.classList && form.classList.contains('no-loader')) return;
+                if (form.id === 'form-export' || form.id === 'bulk-delete-form') return;
+                
+                showLoader();
             });
         });
 

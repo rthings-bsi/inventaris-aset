@@ -3,55 +3,25 @@
 @section('title', 'Laporan Audit - ' . $audit->title)
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-</style>
-
-<!-- Page Header -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-
-    <div class="relative z-10 w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <a href="{{ route('audits.index') }}" class="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:text-indigo-600 transition-colors mb-4">
-                <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-                Kembali ke Daftar
-            </a>
-            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">
-                Laporan Hasil <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700">Audit Aset</span>
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl flex items-center gap-2">
-                Analisis perbandingan antara basis data sistem dan hasil pemindaian riil.
-            </p>
-        </div>
+<x-page-header 
+    title="Laporan Hasil Audit Aset" 
+    subtitle="Analisis perbandingan antara basis data sistem dan hasil pemindaian riil." 
+    emoji="📊"
+>
+    <x-slot name="actions">
         <div class="flex flex-wrap gap-3">
+            <a href="{{ route('audits.index') }}" class="inline-flex items-center gap-2.5 rounded-2xl bg-white border-2 border-indigo-100 px-6 py-3.5 text-xs font-black text-indigo-600 shadow-sm hover:bg-indigo-50 transition-all">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
             <a href="{{ route('audits.export.excel', $audit) }}" class="inline-flex items-center gap-2.5 rounded-2xl bg-white border-2 border-emerald-100 px-6 py-3.5 text-xs font-black text-emerald-600 shadow-sm hover:bg-emerald-50 transition-all">
-                <i class="fas fa-file-excel text-lg"></i>
-                Export Excel
+                <i class="fas fa-file-excel text-lg"></i> Export Excel
             </a>
             <a href="{{ route('audits.export.pdf', $audit) }}" class="inline-flex items-center gap-2.5 rounded-2xl bg-white border-2 border-rose-100 px-6 py-3.5 text-xs font-black text-rose-600 shadow-sm hover:bg-rose-50 transition-all">
-                <i class="fas fa-file-pdf text-lg"></i>
-                Download PDF
+                <i class="fas fa-file-pdf text-lg"></i> PDF Report
             </a>
         </div>
-    </div>
-</div>
+    </x-slot>
+</x-page-header>
 
 <!-- Analytics Dashboard -->
 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">

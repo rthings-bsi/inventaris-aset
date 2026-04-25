@@ -13,9 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 class AssetAuditController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $audits = AssetAudit::with('creator')->latest()->paginate(10);
+        $query = AssetAudit::with('creator')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereAny(['title', 'description'], 'like', "%{$search}%");
+        }
+
+        $audits = $query->paginate(10)->withQueryString();
         return view('audits.index', compact('audits'));
     }
 
@@ -64,18 +71,18 @@ class AssetAuditController extends Controller
 
         // Try to find the asset by code OR ID
         $asset = Asset::where('asset_code', $code)
-            ->orWhere('id', $code)
+            ->orWhere('id_assets', $code)
             ->first();
 
         // Use the actual asset_code if found, otherwise use the scanned code
         $finalCode = $asset ? $asset->asset_code : $code;
 
         // Check if already scanned in this session (by code or by asset_id)
-        $existing = AssetAuditItem::where('asset_audit_id', $audit->id)
+        $existing = AssetAuditItem::where('id_asset_audits', $audit->id_asset_audits)
             ->where(function ($query) use ($asset, $finalCode) {
                 $query->where('scanned_code', $finalCode);
                 if ($asset) {
-                    $query->orWhere('asset_id', $asset->id);
+                    $query->orWhere('id_assets', $asset->id_assets);
                 }
             })
             ->first();
@@ -88,8 +95,8 @@ class AssetAuditController extends Controller
         }
 
         $item = AssetAuditItem::create([
-            'asset_audit_id' => $audit->id,
-            'asset_id' => $asset ? $asset->id : null,
+            'id_asset_audits' => $audit->id_asset_audits,
+            'id_assets' => $asset ? $asset->id_assets : null,
             'scanned_code' => $finalCode,
             'status' => $asset ? 'present' : 'unexpected',
             'scanned_at' => now(),
@@ -115,16 +122,16 @@ class AssetAuditController extends Controller
 
     public function report(AssetAudit $audit)
     {
-        $scannedItems = $audit->items()->pluck('asset_id')->filter()->toArray();
+        $scannedItems = $audit->items()->pluck('id_assets')->filter()->toArray();
         
         // Items in system but not scanned
-        $missingAssets = Asset::whereNotIn('id', $scannedItems)->get();
+        $missingAssets = Asset::whereNotIn('id_assets', $scannedItems)->get();
         
         // Scanned but not in system
-        $unexpectedItems = $audit->items()->whereNull('asset_id')->get();
+        $unexpectedItems = $audit->items()->whereNull('id_assets')->get();
         
         // Scanned and in system
-        $foundItems = $audit->items()->whereNotNull('asset_id')->with('asset')->get();
+        $foundItems = $audit->items()->whereNotNull('id_assets')->with('asset')->get();
 
         return view('audits.report', compact('audit', 'missingAssets', 'unexpectedItems', 'foundItems'));
     }
@@ -136,10 +143,10 @@ class AssetAuditController extends Controller
 
     public function exportPdf(AssetAudit $audit)
     {
-        $scannedItems = $audit->items()->pluck('asset_id')->filter()->toArray();
-        $missingAssets = Asset::whereNotIn('id', $scannedItems)->get();
-        $unexpectedItems = $audit->items()->whereNull('asset_id')->get();
-        $foundItems = $audit->items()->whereNotNull('asset_id')->with('asset')->get();
+        $scannedItems = $audit->items()->pluck('id_assets')->filter()->toArray();
+        $missingAssets = Asset::whereNotIn('id_assets', $scannedItems)->get();
+        $unexpectedItems = $audit->items()->whereNull('id_assets')->get();
+        $foundItems = $audit->items()->whereNotNull('id_assets')->with('asset')->get();
 
         $pdf = Pdf::loadView('audits.report_pdf', compact('audit', 'missingAssets', 'unexpectedItems', 'foundItems'));
         return $pdf->download("Audit_{$audit->title}.pdf");

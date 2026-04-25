@@ -21,7 +21,7 @@ class AssetLoanController extends Controller
         if ($user->hasPermission('loan.manage')) {
             $loans = AssetLoan::with(['asset', 'user'])->latest()->paginate(10);
         } else {
-            $loans = AssetLoan::with(['asset'])->where('user_id', $user->id)->latest()->paginate(10);
+            $loans = AssetLoan::with(['asset'])->where('id_users', $user->id_users)->latest()->paginate(10);
         }
 
         return view('loans.index', compact('loans'));
@@ -30,7 +30,7 @@ class AssetLoanController extends Controller
     {
         if (!auth()->user()->hasPermission('loan.create')) abort(403);
 
-        $query = Asset::whereNull('user_id')
+        $query = Asset::whereNull('id_users')
             ->where('status', 'active')
             ->whereDoesntHave('loans', function ($query) {
                 $query->whereIn('status', ['pending', 'borrowed']);
@@ -52,11 +52,11 @@ class AssetLoanController extends Controller
         if (!auth()->user()->hasPermission('loan.create')) abort(403);
 
         $request->validate([
-            'asset_id' => 'required|exists:assets,id',
+            'id_assets' => 'required|exists:assets,id_assets',
             'notes' => 'nullable|string|max:500'
         ]);
 
-        $asset = Asset::findOrFail($request->asset_id);
+        $asset = Asset::findOrFail($request->id_assets);
 
         // Regular users (without manage permission) can only borrow Grade A/B
         if (!Auth::user()->hasPermission('loan.manage') && !in_array($asset->condition, ['Baik Sekali', 'Baik'])) {
@@ -64,12 +64,12 @@ class AssetLoanController extends Controller
         }
 
         // Check if asset is already borrowed physically
-        if ($asset->user_id) {
+        if ($asset->id_users) {
             return back()->with('error', 'Aset sedang dipinjam oleh pengguna lain.');
         }
 
         // Check if asset has pending requests
-        $hasPending = AssetLoan::where('asset_id', $asset->id)
+        $hasPending = AssetLoan::where('id_assets', $asset->id_assets)
             ->whereIn('status', ['pending', 'borrowed'])
             ->exists();
             
@@ -78,8 +78,8 @@ class AssetLoanController extends Controller
         }
 
         $loan = AssetLoan::create([
-            'asset_id' => $asset->id,
-            'user_id' => Auth::id(),
+            'id_assets' => $asset->id_assets,
+            'id_users' => Auth::id(),
             'loan_date' => now(),
             'status' => 'pending',
             'notes' => $request->notes
@@ -97,7 +97,7 @@ class AssetLoanController extends Controller
             return abort(403);
         }
 
-        if ($loan->asset->user_id) {
+        if ($loan->asset->id_users) {
             return back()->with('error', 'Aset sudah dipinjam pengguna lain. Harap tolak pengajuan ini atau kembalikan aset terlebih dahulu.');
         }
 
@@ -107,7 +107,7 @@ class AssetLoanController extends Controller
         ]);
 
         $loan->asset->update([
-            'user_id' => $loan->user_id
+            'id_users' => $loan->id_users
         ]);
 
         $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'approved', 'Pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda telah disetujui oleh ' . Auth::user()->name . '.'));
@@ -131,7 +131,7 @@ class AssetLoanController extends Controller
     public function return(AssetLoan $loan)
     {
         // Manager or the user who borrowed it
-        if (!Auth::user()->hasPermission('loan.manage') && Auth::id() !== $loan->user_id) {
+        if (!Auth::user()->hasPermission('loan.manage') && Auth::id() !== $loan->id_users) {
             return abort(403);
         }
 
@@ -145,7 +145,7 @@ class AssetLoanController extends Controller
         ]);
 
         $loan->asset->update([
-            'user_id' => null
+            'id_users' => null
         ]);
 
         $managers = User::whereIn('role', ['admin', 'supervisor'])->get();
@@ -160,7 +160,7 @@ class AssetLoanController extends Controller
     public function cancel(AssetLoan $loan)
     {
         // Only the user who created it (or admin) can cancel it
-        if ($loan->user_id !== auth()->id() && !auth()->user()->isAdmin()) {
+        if ($loan->id_users !== auth()->id() && !auth()->user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -182,20 +182,20 @@ class AssetLoanController extends Controller
     public function pinjam(Request $request, Asset $asset)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'id_users' => 'required|exists:users,id_users',
             'notes' => 'nullable|string'
         ]);
 
         $asset->loans()->create([
-            'user_id' => $request->user_id,
+            'id_users' => $request->id_users,
             'loan_date' => now(),
             'status' => 'borrowed',
             'notes' => $request->notes
         ]);
 
-        $asset->update(['user_id' => $request->user_id]);
+        $asset->update(['id_users' => $request->id_users]);
 
-        $user = \App\Models\User::find($request->user_id);
+        $user = \App\Models\User::find($request->id_users);
         return redirect()->route('assets.show', $asset)->with('success', 'Proses serah terima berhasil. Aset dipinjamkan ke ' . $user->name);
     }
 
@@ -212,7 +212,7 @@ class AssetLoanController extends Controller
             ]);
         }
         
-        $asset->update(['user_id' => null]);
+        $asset->update(['id_users' => null]);
 
         return redirect()->route('assets.show', $asset)->with('success', 'Aset telah dikembalikan ke inventory.');
     }

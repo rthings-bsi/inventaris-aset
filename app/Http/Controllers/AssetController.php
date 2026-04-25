@@ -120,13 +120,13 @@ class AssetController extends Controller
     {
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:assets,id'
+            'ids.*' => 'exists:assets,id_assets'
         ]);
 
         try {
-            DB::transaction(function () use ($request) {
-                $assets = Asset::whereIn('id', $request->ids)->get();
+            $assets = Asset::whereIn('id_assets', $request->ids)->get();
 
+            DB::transaction(function () use ($assets) {
                 foreach ($assets as $asset) {
                     if ($asset->photo) {
                         Storage::disk('public')->delete($asset->photo);
@@ -136,7 +136,7 @@ class AssetController extends Controller
                 }
             });
 
-            return redirect()->route('assets.index')->with('success', count($request->ids) . ' aset berhasil dihapus permanen secara massal!');
+            return redirect()->route('assets.index')->with('success', count($assets) . ' aset berhasil dihapus permanen secara massal!');
         } catch (\Exception $e) {
             \Log::error('Bulk Delete Error: ' . $e->getMessage(), [
                 'ids' => $request->ids,

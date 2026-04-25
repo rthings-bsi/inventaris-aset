@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    
+    protected $primaryKey = 'id_users';
 
     /**
      * The attributes that are mass assignable.
@@ -65,11 +67,6 @@ class User extends Authenticatable
 
     public function hasPermission(string $permission): bool
     {
-        // Admin always has all permissions
-        if ($this->isAdmin()) {
-            return true;
-        }
-
         return \App\Models\RolePermission::where('role', $this->role)
             ->where('permission', $permission)
             ->exists();

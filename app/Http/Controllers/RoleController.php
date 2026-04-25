@@ -9,10 +9,20 @@ class RoleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         abort_if(!auth()->user()->isAdmin(), 403);
-        $roles = \App\Models\Role::all();
+        
+        $query = \App\Models\Role::latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('slug', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        $roles = $query->get();
         return view('roles.index', compact('roles'));
     }
 

@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('assets', function (Blueprint $table) {
             $table->dropColumn(['category', 'location', 'person_in_charge']);
-            $table->foreignId('category_id')->nullable()->constrained('categories')->nullOnDelete();
-            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('id_categories')->nullable()->constrained('categories', 'id_categories')->nullOnDelete();
+            $table->foreignId('id_locations')->nullable()->constrained('locations', 'id_locations')->nullOnDelete();
+            $table->foreignId('id_users')->nullable()->constrained('users', 'id_users')->nullOnDelete();
         });
     }
 
@@ -25,10 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('assets', function (Blueprint $table) {
-            $table->dropForeign(['category_id']);
-            $table->dropForeign(['location_id']);
-            $table->dropForeign(['user_id']);
-            $table->dropColumn(['category_id', 'location_id', 'user_id']);
+            $table->dropForeign(['id_categories']);
+            $table->dropForeign(['id_locations']);
+            $table->dropForeign(['id_users']);
+            $table->dropColumn(['id_categories', 'id_locations', 'id_users']);
             $table->string('category');
             $table->string('location');
             $table->string('person_in_charge')->nullable();

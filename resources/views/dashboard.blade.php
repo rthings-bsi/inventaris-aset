@@ -3,64 +3,20 @@
 @section('title', 'Dashboard - Inventaris Aset')
 
 @section('content')
-<style>
-    /* Custom playful but smooth animations */
-    @keyframes float {
-        0%, 100% { transform: translateY(0px) scale(1); }
-        50% { transform: translateY(-8px) scale(1.02); }
-    }
-    @keyframes wiggle {
-        0%, 100% { transform: rotate(-3deg); }
-        50% { transform: rotate(3deg); }
-    }
-    @keyframes gradientBlob {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        33% { transform: translate(20px, -30px) scale(1.05); }
-        66% { transform: translate(-15px, 15px) scale(0.95); }
-    }
-    
-    .animate-float { animation: float 4s ease-in-out infinite; }
-    .animate-wiggle { animation: wiggle 2s ease-in-out infinite; }
-    .blob { animation: gradientBlob 12s ease-in-out infinite alternate; }
-    
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-    }
-</style>
-
-<!-- Header Section -->
-<div class="relative glass-header rounded-[2rem] p-8 md:p-10 mb-10 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-2 border-white group">
-    <!-- Decorative Blobs (Softened for professional look) -->
-    <div class="absolute -top-20 -right-20 w-80 h-80 bg-gradient-to-br from-indigo-200/60 to-purple-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none"></div>
-    <div class="absolute -bottom-20 right-20 w-64 h-64 bg-gradient-to-br from-pink-200/60 to-rose-200/60 rounded-full mix-blend-multiply filter blur-[3rem] opacity-70 blob pointer-events-none" style="animation-delay: 2s;"></div>
-    
-    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700 tracking-tight flex items-center gap-3">
-                Selamat Datang, {{ auth()->user()->name }} <span class="animate-wiggle inline-block text-3xl">👋</span>
-            </h1>
-            <p class="text-gray-600 mt-2 font-semibold text-lg max-w-xl">Ringkasan performa dan akses sistem untuk role <span class="text-indigo-600 font-bold border-b-2 border-indigo-100">{{ auth()->user()->role_display_name }}</span>.✨</p>
-        </div>
-        <div>
-            <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-sm text-sm font-black text-indigo-700 flex items-center gap-3 transform group-hover:scale-105 transition-transform duration-500 cursor-default border-2 border-indigo-50">
-                <div class="w-10 h-10 flex items-center justify-center bg-indigo-50 rounded-xl shadow-inner">
-                    <i class="far fa-calendar-alt text-indigo-500 text-lg group-hover:animate-bounce-sm"></i>
-                </div>
-                {{ now()->format('d F Y') }}
+<x-page-header 
+    title="Selamat Datang, {{ auth()->user()->name }}" 
+    subtitle="Ringkasan performa dan akses sistem untuk role {{ auth()->user()->role_display_name }}." 
+    emoji="👋"
+>
+    <x-slot name="actions">
+        <div class="bg-white/90 backdrop-blur-md px-6 py-4 rounded-2xl shadow-sm text-sm font-black text-indigo-700 flex items-center gap-3 transform group-hover:scale-105 transition-transform duration-500 cursor-default border-2 border-indigo-50">
+            <div class="w-10 h-10 flex items-center justify-center bg-indigo-50 rounded-xl shadow-inner">
+                <i class="far fa-calendar-alt text-indigo-500 text-lg group-hover:animate-bounce-sm"></i>
             </div>
+            {{ now()->format('d F Y') }}
         </div>
-    </div>
-</div>
+    </x-slot>
+</x-page-header>
 
 <!-- Statistics Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">

@@ -3,44 +3,24 @@
 @section('title', 'Peminjaman Aset - Inventaris')
 
 @section('content')
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.8);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-    }
-    .glass-header {
-        background: linear-gradient(135deg, rgba(238, 242, 255, 0.9) 0%, rgba(243, 232, 255, 0.9) 100%);
-        backdrop-filter: blur(20px);
-        border-bottom: 2px solid white;
-    }
-</style>
+<x-page-header 
+    title="Peminjaman Aset" 
+    subtitle="Daftar permintaan peminjaman dan riwayat pengembalian aset." 
+    emoji="🤝" 
+/>
 
-<!-- Page Header -->
-<div class="relative glass-header rounded-[2rem] p-5 sm:p-8 mb-6 sm:mb-8 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-slide-down">
-    <div class="absolute -right-10 -top-10 w-40 h-40 bg-gradient-to-br from-indigo-200/50 to-purple-200/50 rounded-full mix-blend-multiply filter blur-2xl animate-pulse"></div>
-    <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-700 flex items-center gap-2">
-                <i class="fas fa-handshake text-indigo-500"></i> Peminjaman Aset
-            </h1>
-            <p class="text-sm font-bold text-gray-500 mt-2">Daftar permintaan peminjaman dan riwayat pengembalian aset.</p>
-        </div>
-        <div>
-            <a href="{{ route('loans.create') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_8px_25px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all font-black text-sm gap-2">
-                <i class="fas fa-plus"></i> Ajukan Peminjaman
-            </a>
-        </div>
-    </div>
+<!-- Action Row -->
+<div class="mb-5 relative z-30 flex flex-row items-center justify-end gap-4 w-full">
+    <a href="{{ route('loans.create') }}" class="group relative inline-flex items-center justify-center px-8 py-3.5 text-[14px] font-black text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-[0_10px_25px_rgba(79,70,229,0.35)] hover:shadow-[0_15px_35px_rgba(79,70,229,0.45)] hover:-translate-y-1 border border-white/20 whitespace-nowrap">
+        <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-300 text-lg"></i> Ajukan Peminjaman
+    </a>
 </div>
 
-<!-- List Ruangan / Card View -->
-<div class="glass-card rounded-[2rem] overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
-    <div class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50 px-5 sm:px-6 py-4 sm:py-5 border-b border-indigo-100/50">
-        <h2 class="text-sm font-black text-indigo-700 uppercase tracking-widest flex items-center gap-2">
-            <i class="fas fa-list text-indigo-400"></i> Riwayat Peminjaman
+<!-- Main Content Row -->
+<div class="bg-white/60 backdrop-blur-xl border border-white rounded-[2rem] p-6 shadow-sm mb-6 relative z-20 overflow-hidden animate-fade-in-up" style="animation-delay: 0.1s;">
+    <div class="flex items-center justify-between mb-8">
+        <h2 class="text-sm font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2">
+            <i class="fas fa-list"></i> Riwayat Peminjaman
         </h2>
     </div>
 
@@ -101,35 +81,35 @@
                                 <span class="bg-red-100 text-red-700 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-red-200">Ditolak</span>
                             @endif
                         </td>
-                        <td class="p-4 flex gap-2 justify-center">
+                        <td class="p-4 flex gap-2 justify-end">
                             @if(auth()->user()->hasPermission('loan.manage') && $loan->status == 'pending')
                                 <form action="{{ route('loans.approve', $loan) }}" method="POST">
                                     @csrf
-                                    <button type="button" onclick="handleLoanAction(this, 'Setujui', 'Persetujuan peminjaman aset ini akan diproses.', 'success')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Setujui">
+                                    <button type="button" onclick="handleLoanAction(this, 'Setujui', 'Persetujuan peminjaman aset ini akan diproses.', 'success')" class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Setujui">
                                         <i class="fas fa-check"></i>
                                     </button>
                                 </form>
                                 <form action="{{ route('loans.reject', $loan) }}" method="POST">
                                     @csrf
-                                    <button type="button" onclick="handleLoanAction(this, 'Tolak', 'Permohonan peminjaman ini akan ditolak.', 'error')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
+                                    <button type="button" onclick="handleLoanAction(this, 'Tolak', 'Permohonan peminjaman ini akan ditolak.', 'error')" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
                             @endif
                             
-                            @if($loan->status == 'pending' && auth()->id() == $loan->user_id)
+                            @if($loan->status == 'pending' && auth()->id() == $loan->id_users)
                                 <form action="{{ route('loans.cancel', $loan) }}" method="POST">
                                     @csrf
-                                    <button type="button" onclick="handleLoanAction(this, 'Batalkan', 'Pengajuan peminjaman ini akan dibatalkan secara permanen.', 'warning')" class="w-8 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-500 hover:text-white border border-gray-200 shadow-sm transition-all flex items-center justify-center text-sm" title="Batalkan Pengajuan">
+                                    <button type="button" onclick="handleLoanAction(this, 'Batalkan', 'Pengajuan peminjaman ini akan dibatalkan secara permanen.', 'warning')" class="w-9 h-9 rounded-xl bg-gray-50 text-gray-600 hover:bg-gray-500 hover:text-white border border-gray-200 shadow-sm transition-all flex items-center justify-center text-sm" title="Batalkan Pengajuan">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </form>
                             @endif
                             
-                            @if($loan->status == 'borrowed' && (auth()->user()->hasPermission('loan.manage') || auth()->id() == $loan->user_id))
+                            @if($loan->status == 'borrowed' && (auth()->user()->hasPermission('loan.manage') || auth()->id() == $loan->id_users))
                                 <form action="{{ route('loans.return', $loan) }}" method="POST">
                                     @csrf
-                                    <button type="button" onclick="handleLoanAction(this, 'Kembalikan', 'Aset akan dikembalikan ke gudang.', 'question')" class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Kembalikan Aset">
+                                    <button type="button" onclick="handleLoanAction(this, 'Kembalikan', 'Aset akan dikembalikan ke gudang.', 'question')" class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Kembalikan Aset">
                                         <i class="fas fa-undo"></i>
                                     </button>
                                 </form>
@@ -220,7 +200,7 @@
                     </form>
                 @endif
                 
-                @if($loan->status == 'pending' && (auth()->check() && auth()->id() == $loan->user_id))
+                @if($loan->status == 'pending' && (auth()->check() && auth()->id() == $loan->id_users))
                     <form action="{{ route('loans.cancel', $loan) }}" method="POST" class="inline">
                         @csrf
                         <button type="button" onclick="handleLoanAction(this, 'Batalkan', 'Pengajuan peminjaman ini akan dibatalkan secara permanen.', 'warning')" class="px-4 h-8 rounded-lg bg-gray-50 text-gray-600 hover:bg-gray-500 hover:text-white border border-gray-200 shadow-sm transition-all flex items-center justify-center text-xs font-bold gap-1" title="Batalkan Pengajuan">
@@ -229,7 +209,7 @@
                     </form>
                 @endif
                 
-                @if($loan->status == 'borrowed' && (auth()->check() && (auth()->user()->hasPermission('loan.manage') || auth()->id() == $loan->user_id)))
+                @if($loan->status == 'borrowed' && (auth()->check() && (auth()->user()->hasPermission('loan.manage') || auth()->id() == $loan->id_users)))
                     <form action="{{ route('loans.return', $loan) }}" method="POST" class="inline">
                         @csrf
                         <button type="button" onclick="handleLoanAction(this, 'Kembalikan', 'Aset akan dikembalikan ke gudang.', 'question')" class="px-4 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white border border-amber-100 shadow-sm transition-all flex items-center justify-center text-xs font-bold gap-1" title="Kembalikan Aset">

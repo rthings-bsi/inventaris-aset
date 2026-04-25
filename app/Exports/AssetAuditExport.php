@@ -21,10 +21,10 @@ class AssetAuditExport implements FromCollection, WithHeadings, WithMapping, Wit
     public function collection()
     {
         $scannedItems = $this->audit->items()->with('asset')->get();
-        $scannedIds = $scannedItems->pluck('asset_id')->filter()->toArray();
+        $scannedIds = $scannedItems->pluck('id_assets')->filter()->toArray();
 
         // All assets that should be there
-        $missingAssets = Asset::whereNotIn('id', $scannedIds)->get();
+        $missingAssets = Asset::whereNotIn('id_assets', $scannedIds)->get();
 
         $data = collect([]);
 

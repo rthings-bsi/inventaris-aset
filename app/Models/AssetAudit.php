@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetAudit extends Model
 {
+    protected $primaryKey = 'id_asset_audits';
+
     protected $fillable = ['title', 'description', 'audit_date', 'status', 'created_by'];
 
     protected $casts = [
@@ -14,7 +16,7 @@ class AssetAudit extends Model
 
     public function items()
     {
-        return $this->hasMany(AssetAuditItem::class);
+        return $this->hasMany(AssetAuditItem::class, 'id_asset_audits');
     }
 
     public function creator()

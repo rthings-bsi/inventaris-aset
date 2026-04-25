@@ -21,18 +21,18 @@ class UpdateAssetRequest extends FormRequest
      */
     public function rules(): array
     {
-        $assetId = $this->route('asset')->id;
+        $assetId = $this->route('asset')->id_assets;
         
         return [
-            'asset_code' => 'required|unique:assets,asset_code,' . $assetId,
+            'asset_code' => 'required|unique:assets,asset_code,' . $assetId . ',id_assets',
             'asset_name' => 'required|max:255',
             'description' => 'nullable',
-            'category_id' => 'required|exists:categories,id',
+            'id_categories' => 'required|exists:categories,id_categories',
             'acquisition_cost' => 'required|numeric|min:0',
             'acquisition_date' => 'required|date',
             'condition' => 'required',
-            'location_id' => 'required|exists:locations,id',
-            'user_id' => 'nullable|exists:users,id',
+            'id_locations' => 'required|exists:locations,id_locations',
+            'id_users' => 'nullable|exists:users,id_users',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'status' => 'required|in:active,maintenance,broken,disposed'
         ];

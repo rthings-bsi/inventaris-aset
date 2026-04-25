@@ -11,17 +11,19 @@ use Spatie\Activitylog\LogOptions;
 class Asset extends Model
 {
     use HasFactory, SoftDeletes, LogsActivity;
+    
+    protected $primaryKey = 'id_assets';
 
     protected $fillable = [
         'asset_code',
         'asset_name',
         'description',
-        'category_id',
+        'id_categories',
         'acquisition_cost',
         'acquisition_date',
         'condition',
-        'location_id',
-        'user_id',
+        'id_locations',
+        'id_users',
         'person_in_charge',
         'photo',
         'status'
@@ -36,7 +38,7 @@ class Asset extends Model
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['category'] ?? false, function ($query, $category) {
-            $query->where('category_id', $category);
+            $query->where('id_categories', $category);
         });
 
         $query->when($filters['status'] ?? false, function ($query, $status) {
@@ -64,22 +66,22 @@ class Asset extends Model
 
     public function loans()
     {
-        return $this->hasMany(AssetLoan::class);
+        return $this->hasMany(AssetLoan::class, 'id_assets', 'id_assets');
     }
 
     public function category()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'id_categories', 'id_categories');
     }
 
     public function location()
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsTo(Location::class, 'id_locations', 'id_locations');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id_users', 'id_users');
     }
 
     public function getActivitylogOptions(): LogOptions

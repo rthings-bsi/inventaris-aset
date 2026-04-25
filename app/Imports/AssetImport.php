@@ -50,7 +50,7 @@ class AssetImport implements ToCollection, WithHeadingRow
             if ($userName) {
                 $user = \App\Models\User::where('name', $userName)->first();
                 if ($user) {
-                    $userId = $user->id;
+                    $userId = $user->id_users;
                 }
             }
 
@@ -68,13 +68,13 @@ class AssetImport implements ToCollection, WithHeadingRow
                 ['asset_code' => $row['asset_code']], // Atribut pencarian (unik)
                 [
                     'asset_name'         => $row['asset_name'],
-                    'category_id'       => $category->id,
+                    'id_categories'       => $category->id_categories,
                     'condition'           => $condition,
                     'status'            => strtolower($row['status'] ?? 'active'),
-                    'location_id'       => $location->id,
+                    'id_locations'       => $location->id_locations,
                     'acquisition_cost'   => is_numeric($row['acquisition_cost'] ?? null) ? $row['acquisition_cost'] : 0,
                     'acquisition_date' => $tanggal ?? now(),
-                    'user_id'           => null, // Ensure available for borrowing by default when imported
+                    'id_users'           => null, // Ensure available for borrowing by default when imported
                     'person_in_charge'  => $row['person_in_charge'] ?? null,
                     'description'         => $row['description'] ?? null,
                 ]
