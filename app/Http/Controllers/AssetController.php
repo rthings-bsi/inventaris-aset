@@ -102,6 +102,11 @@ class AssetController extends Controller
      */
     public function destroy(Asset $asset)
     {
+        // Cek apakah aset sedang dipinjam atau ada pengajuan peminjaman
+        if ($asset->id_users !== null || $asset->loans()->whereIn('status', ['borrowed', 'pending'])->exists()) {
+            return redirect()->route('assets.index')->with('error', 'Aset "' . $asset->asset_name . '" tidak bisa dihapus karena sedang dipinjam atau dalam proses pengajuan peminjaman!');
+        }
+
         // Delete photo if exists
         if ($asset->photo) {
             Storage::disk('public')->delete($asset->photo);
@@ -125,6 +130,13 @@ class AssetController extends Controller
 
         try {
             $assets = Asset::whereIn('id_assets', $request->ids)->get();
+
+            // Cek apakah ada aset yang sedang dipinjam atau ada pengajuan peminjaman
+            foreach ($assets as $asset) {
+                if ($asset->id_users !== null || $asset->loans()->whereIn('status', ['borrowed', 'pending'])->exists()) {
+                    return redirect()->route('assets.index')->with('error', 'Penghapusan massal dibatalkan! Aset "' . $asset->asset_name . '" tidak bisa dihapus karena sedang dipinjam atau dalam proses pengajuan peminjaman.');
+                }
+            }
 
             DB::transaction(function () use ($assets) {
                 foreach ($assets as $asset) {
