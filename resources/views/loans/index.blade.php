@@ -295,6 +295,6 @@
                 form.submit();
             }
         });
-    }`
+    }
 </script>
 @endsection
