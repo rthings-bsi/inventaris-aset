@@ -79,6 +79,9 @@
                                 <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-emerald-200">Dikembalikan</span>
                             @elseif($loan->status == 'rejected')
                                 <span class="bg-red-100 text-red-700 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-red-200">Ditolak</span>
+                                @if($loan->reject_reason)
+                                    <p class="text-[10px] font-bold text-red-500 mt-1 italic w-full line-clamp-2" title="{{ $loan->reject_reason }}">Alasan: {{ $loan->reject_reason }}</p>
+                                @endif
                             @endif
                         </td>
                         <td class="p-4 flex gap-2 justify-end">
@@ -91,7 +94,7 @@
                                 </form>
                                 <form action="{{ route('loans.reject', $loan) }}" method="POST">
                                     @csrf
-                                    <button type="button" onclick="handleLoanAction(this, 'Tolak', 'Permohonan peminjaman ini akan ditolak.', 'error')" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
+                                    <button type="button" onclick="handleRejectAction(this)" class="w-9 h-9 rounded-xl bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </form>
@@ -161,7 +164,12 @@
                     @elseif($loan->status == 'returned')
                         <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1 rounded-lg border border-emerald-200"><i class="fas fa-check mr-1"></i>Kembali</span>
                     @elseif($loan->status == 'rejected')
-                        <span class="bg-red-100 text-red-700 text-[10px] font-black uppercase px-2 py-1 rounded-lg border border-red-200"><i class="fas fa-times mr-1"></i>Ditolak</span>
+                        <div class="flex flex-col items-end">
+                            <span class="bg-red-100 text-red-700 text-[10px] font-black uppercase px-2 py-1 rounded-lg border border-red-200"><i class="fas fa-times mr-1"></i>Ditolak</span>
+                            @if($loan->reject_reason)
+                                <p class="text-[9px] text-red-500 mt-1 italic max-w-[120px] truncate" title="{{ $loan->reject_reason }}">{{ $loan->reject_reason }}</p>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>
@@ -188,7 +196,7 @@
                 @if(auth()->check() && auth()->user()->hasPermission('loan.manage') && $loan->status == 'pending')
                     <form action="{{ route('loans.reject', $loan) }}" method="POST" class="inline">
                         @csrf
-                        <button type="button" onclick="handleLoanAction(this, 'Tolak', 'Permohonan peminjaman ini akan ditolak.', 'error')" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
+                        <button type="button" onclick="handleRejectAction(this)" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-100 shadow-sm transition-all flex items-center justify-center text-sm" title="Tolak">
                             <i class="fas fa-times"></i>
                         </button>
                     </form>
@@ -250,5 +258,43 @@
             }
         });
     }
+
+    function handleRejectAction(btn) {
+        Swal.fire({
+            title: 'Tolak Peminjaman?',
+            text: 'Permohonan peminjaman ini akan ditolak. Silakan masukkan alasan penolakan:',
+            icon: 'error',
+            input: 'textarea',
+            inputPlaceholder: 'Masukkan alasan...',
+            inputAttributes: {
+                'aria-label': 'Masukkan alasan penolakan'
+            },
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Tolak',
+            cancelButtonText: 'Batal',
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Alasan penolakan wajib diisi!'
+                }
+            },
+            customClass: {
+                confirmButton: 'swal2-confirm font-sans swal2-confirm-danger',
+                cancelButton: 'swal2-cancel font-sans',
+                popup: 'swal2-popup',
+                title: 'swal2-title',
+                input: 'w-full px-4 py-3 border border-gray-300 rounded-xl mt-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm font-sans bg-gray-50'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = btn.closest('form');
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'reject_reason';
+                hiddenInput.value = result.value;
+                form.appendChild(hiddenInput);
+                form.submit();
+            }
+        });
+    }`
 </script>
 @endsection

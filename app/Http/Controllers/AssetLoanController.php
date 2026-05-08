@@ -115,15 +115,24 @@ class AssetLoanController extends Controller
         return back()->with('success', 'Pengajuan peminjaman disetujui.');
     }
 
-    public function reject(AssetLoan $loan)
+    public function reject(Request $request, AssetLoan $loan)
     {
         if (!Auth::user()->hasPermission('loan.manage')) {
             return abort(403);
         }
 
-        $loan->update(['status' => 'rejected']);
+        $request->validate([
+            'reject_reason' => 'required|string|max:500'
+        ], [
+            'reject_reason.required' => 'Alasan penolakan wajib diisi.'
+        ]);
 
-        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'rejected', 'Maaf, pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda ditolak oleh ' . Auth::user()->name . '.'));
+        $loan->update([
+            'status' => 'rejected',
+            'reject_reason' => $request->reject_reason
+        ]);
+
+        $loan->user->notify(new \App\Notifications\AssetLoanNotification($loan, 'rejected', 'Maaf, pengajuan peminjaman unit ' . $loan->asset->asset_name . ' Anda ditolak oleh ' . Auth::user()->name . '. Alasan: ' . $request->reject_reason));
 
         return back()->with('success', 'Pengajuan peminjaman ditolak.');
     }
