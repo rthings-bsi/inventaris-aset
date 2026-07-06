@@ -58,7 +58,26 @@ class AssetRepairController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->back()->with('success', 'Laporan perbaikan berhasil dibuat.');
+        // Update asset status immediately when damage is reported
+        $asset = Asset::find($request->id_assets);
+        if ($asset) {
+            $statusMap = [
+                'damage' => 'broken',
+                'maintenance' => 'maintenance',
+                'warranty' => 'maintenance',
+            ];
+            $conditionMap = [
+                'damage' => 'D',
+                'maintenance' => 'C',
+                'warranty' => 'C',
+            ];
+            $asset->update([
+                'status' => $statusMap[$request->repair_type] ?? 'maintenance',
+                'condition' => $conditionMap[$request->repair_type] ?? 'C',
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Laporan perbaikan berhasil dibuat. Status aset telah diperbarui.');
     }
 
     /**

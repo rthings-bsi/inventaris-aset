@@ -170,7 +170,12 @@ class AssetLoanController extends Controller
                 'status' => AssetRepair::STATUS_REPORTED,
                 'created_by' => auth()->id(),
             ]);
-            session()->flash('warning', 'Aset dikembalikan dengan kondisi grade ' . $loan->asset->condition . '. Catatan perbaikan otomatis dibuat. Silakan update biaya perbaikan di menu Perbaikan & Perawatan.');
+            // Ensure asset status reflects the damage
+            $loan->asset->update(['status' => 'broken']);
+            session()->flash('warning', 'Aset dikembalikan dengan kondisi grade ' . $loan->asset->condition . '. Status aset: Rusak. Catatan perbaikan otomatis dibuat.');
+        } else {
+            // Normal return — ensure asset is active
+            $loan->asset->update(['status' => 'active']);
         }
 
         $managers = User::whereIn('role', ['admin', 'supervisor'])->get();
