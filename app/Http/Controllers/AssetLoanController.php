@@ -167,7 +167,7 @@ class AssetLoanController extends Controller
                 'description' => 'Kerusakan terdeteksi saat pengembalian aset dari peminjaman oleh ' . $loan->user->name,
                 'repair_type' => 'damage',
                 'cost' => 0,
-                'status' => 'pending',
+                'status' => AssetRepair::STATUS_REPORTED,
                 'created_by' => auth()->id(),
             ]);
             session()->flash('warning', 'Aset dikembalikan dengan kondisi grade ' . $loan->asset->condition . '. Catatan perbaikan otomatis dibuat. Silakan update biaya perbaikan di menu Perbaikan & Perawatan.');

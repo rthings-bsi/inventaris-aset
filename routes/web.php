@@ -84,6 +84,10 @@ Route::middleware('auth')->group(function () {
 	Route::post('repairs', [App\Http\Controllers\AssetRepairController::class, 'store'])->name('repairs.store');
 	Route::put('repairs/{repair}', [App\Http\Controllers\AssetRepairController::class, 'update'])->name('repairs.update');
 	Route::delete('repairs/{repair}', [App\Http\Controllers\AssetRepairController::class, 'destroy'])->name('repairs.destroy');
+	Route::post('repairs/{repair}/start', [App\Http\Controllers\AssetRepairController::class, 'start'])->name('repairs.start');
+	Route::post('repairs/{repair}/complete', [App\Http\Controllers\AssetRepairController::class, 'complete'])->name('repairs.complete');
+	Route::post('repairs/{repair}/approve', [App\Http\Controllers\AssetRepairController::class, 'approve'])->name('repairs.approve');
+	Route::post('repairs/{repair}/handover', [App\Http\Controllers\AssetRepairController::class, 'handover'])->name('repairs.handover');
 
 	// Audits
 	Route::get('audits', [App\Http\Controllers\AssetAuditController::class, 'index'])->name('audits.index');
