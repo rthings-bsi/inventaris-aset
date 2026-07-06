@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetAudit;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display dashboard with statistics
-     */
     public function index()
     {
         $stats = [
@@ -44,7 +42,55 @@ class DashboardController extends Controller
         ];
 
         $recent_assets = Asset::latest()->take(5)->get();
+
+        // ─── Audit Statistics ─────────────────────────────────
+        $auditStats = [
+            'total_audits' => AssetAudit::count(),
+            'completed_audits' => AssetAudit::where('status', 'completed')->count(),
+            'open_audits' => AssetAudit::where('status', 'open')->count(),
+            'monthly_audits' => AssetAudit::whereMonth('audit_date', now()->month)
+                ->whereYear('audit_date', now()->year)
+                ->count(),
+            'weekly_audits' => AssetAudit::whereBetween('audit_date', [now()->startOfWeek(), now()->endOfWeek()])
+                ->count(),
+            'next_audit' => AssetAudit::where('status', 'open')
+                ->whereNotNull('next_audit_date')
+                ->orderBy('next_audit_date')
+                ->first(),
+            'upcoming_audits' => AssetAudit::where('status', 'open')
+                ->where('audit_date', '>=', now())
+                ->orWhere(function($q) {
+                    $q->whereNotNull('next_audit_date')
+                      ->where('next_audit_date', '>=', now());
+                })
+                ->orderBy('audit_date')
+                ->take(3)
+                ->get(),
+        ];
+
+        // Audit grade distribution (from completed audits)
+        $gradeDistribution = Asset::select('condition', DB::raw('count(*) as count'))
+            ->whereIn('condition', ['A', 'B', 'C', 'D', 'E'])
+            ->groupBy('condition')
+            ->orderBy('condition')
+            ->get();
+        $auditStats['grade_labels'] = $gradeDistribution->pluck('condition')->toArray();
+        $auditStats['grade_data'] = $gradeDistribution->pluck('count')->toArray();
+
+        // Audit history last 6 months
+        $auditHistory = AssetAudit::select(
+                DB::raw("strftime('%Y-%m', audit_date) as month"),
+                DB::raw('count(*) as total'),
+                DB::raw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed")
+            )
+            ->where('audit_date', '>=', now()->subMonths(6))
+            ->groupBy(DB::raw("strftime('%Y-%m', audit_date)"))
+            ->orderBy('month')
+            ->get();
+        $auditStats['history_months'] = $auditHistory->pluck('month')->toArray();
+        $auditStats['history_total'] = $auditHistory->pluck('total')->toArray();
+        $auditStats['history_completed'] = $auditHistory->pluck('completed')->toArray();
         
-        return view('dashboard', compact('stats', 'recent_assets', 'chart_data'));
+        return view('dashboard', compact('stats', 'recent_assets', 'chart_data', 'auditStats'));
     }
 }

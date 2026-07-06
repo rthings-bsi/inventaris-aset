@@ -10,6 +10,9 @@
 >
     <x-slot name="actions">
         <div class="flex flex-col md:flex-row gap-3">
+            <a href="{{ route('audits.checklist', $audit) }}" class="group inline-flex items-center justify-center px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm border border-emerald-100">
+                <i class="fas fa-clipboard-list mr-2 group-hover:scale-110 transition-transform"></i> Mode Checklist
+            </a>
             <a href="{{ route('audits.index') }}" class="group inline-flex items-center justify-center px-4 py-2 bg-white/60 hover:bg-white text-indigo-600 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all shadow-sm border border-indigo-50">
                 <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Kembali
             </a>
@@ -21,6 +24,33 @@
 </x-page-header>
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+    <!-- Stats Row -->
+    <div class="lg:col-span-12 grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+        <div class="glass-card rounded-2xl p-4 text-center">
+            <p class="text-[8px] font-black uppercase tracking-widest text-gray-400">Total</p>
+            <p class="text-xl font-black text-gray-800">{{ $stats['total'] }}</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center border-l-4 border-amber-400">
+            <p class="text-[8px] font-black uppercase tracking-widest text-amber-500">Pending</p>
+            <p class="text-xl font-black text-amber-600">{{ $stats['pending'] }}</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center border-l-4 border-emerald-400">
+            <p class="text-[8px] font-black uppercase tracking-widest text-emerald-500">Scanned</p>
+            <p class="text-xl font-black text-emerald-600">{{ $stats['scanned'] }}</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center border-l-4 border-emerald-400">
+            <p class="text-[8px] font-black uppercase tracking-widest text-emerald-500">Grade A</p>
+            <p class="text-xl font-black text-emerald-600">{{ $stats['grade_a'] }}</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center border-l-4 border-amber-400">
+            <p class="text-[8px] font-black uppercase tracking-widest text-amber-500">Grade B/C</p>
+            <p class="text-xl font-black text-amber-600">{{ $stats['grade_b'] + $stats['grade_c'] }}</p>
+        </div>
+        <div class="glass-card rounded-2xl p-4 text-center border-l-4 border-red-400">
+            <p class="text-[8px] font-black uppercase tracking-widest text-red-500">Grade D/E</p>
+            <p class="text-xl font-black text-red-600">{{ $stats['grade_d'] + $stats['grade_e'] }}</p>
+        </div>
+    </div>
     <!-- Scanner Side -->
     <div class="lg:col-span-5 space-y-6">
         <div class="glass-card rounded-[2.5rem] p-8 relative overflow-hidden">

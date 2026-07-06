@@ -110,6 +110,150 @@
     </a>
 </div>
 
+<!-- Audit Activity Section -->
+<div class="glass-card rounded-[2rem] p-6 shadow-sm mb-8 relative overflow-hidden border-t-2 border-l-2 border-white/80 group/audit">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-emerald-50/40 rounded-full blur-[4rem] opacity-40 -z-10 pointer-events-none"></div>
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 text-emerald-500 shadow-sm border border-white">
+                <i class="fas fa-clipboard-check text-2xl"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-black text-gray-800 tracking-tight">Aktivitas Audit 🔍</h2>
+                <p class="text-[12px] font-bold text-gray-500 mt-0.5">Monitoring audit aset berkala — bulanan & mingguan</p>
+            </div>
+        </div>
+        <a href="{{ route('audits.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-emerald-100 text-emerald-600 rounded-xl text-xs font-black hover:bg-emerald-50 hover:shadow-md transition-all">
+            Kelola Audit <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+    </div>
+
+    <!-- Mini Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Audit</p>
+            <p class="text-3xl font-black text-gray-800">{{ $auditStats['total_audits'] }}</p>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded-lg">{{ $auditStats['completed_audits'] }} selesai</span>
+                @if($auditStats['open_audits'] > 0)
+                <span class="text-[10px] font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg animate-pulse">{{ $auditStats['open_audits'] }} aktif</span>
+                @endif
+            </div>
+        </div>
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Bulan Ini</p>
+            <p class="text-3xl font-black text-indigo-600">{{ $auditStats['monthly_audits'] }}</p>
+            <p class="text-[10px] font-bold text-gray-400 mt-1">Audit bulan {{ now()->format('F') }}</p>
+        </div>
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Minggu Ini</p>
+            <p class="text-3xl font-black text-purple-600">{{ $auditStats['weekly_audits'] }}</p>
+            <p class="text-[10px] font-bold text-gray-400 mt-1">Audit periode mingguan</p>
+        </div>
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <p class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-1">Audit Terjadwal</p>
+            <p class="text-3xl font-black text-amber-600">{{ $auditStats['upcoming_audits']->count() }}</p>
+            <p class="text-[10px] font-bold text-gray-400 mt-1">Akan datang</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Grade Distribution -->
+        @if(!empty($auditStats['grade_labels']))
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-pie text-indigo-300"></i> Distribusi Grade Kondisi
+            </h4>
+            <div class="space-y-3">
+                @foreach($auditStats['grade_labels'] as $i => $grade)
+                @php
+                    $count = $auditStats['grade_data'][$i] ?? 0;
+                    $total = array_sum($auditStats['grade_data']) ?: 1;
+                    $pct = round(($count / $total) * 100);
+                    $barColor = $grade === 'A' ? 'bg-emerald-500' : ($grade === 'B' ? 'bg-blue-500' : ($grade === 'C' ? 'bg-amber-500' : ($grade === 'D' ? 'bg-orange-500' : 'bg-red-500')));
+                @endphp
+                <div class="flex items-center gap-3">
+                    <span class="w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black {{ $grade === 'A' ? 'bg-emerald-100 text-emerald-700' : ($grade === 'B' ? 'bg-blue-100 text-blue-700' : ($grade === 'C' ? 'bg-amber-100 text-amber-700' : ($grade === 'D' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'))) }}">{{ $grade }}</span>
+                    <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full transition-all duration-1000 {{ $barColor }}" style="width: {{ $pct }}%"></div>
+                    </div>
+                    <span class="text-[11px] font-black text-gray-500 w-10 text-right">{{ $count }}</span>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        <!-- Upcoming Audits -->
+        <div class="bg-white/70 rounded-2xl p-5 border border-gray-50">
+            <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-indigo-300"></i> Jadwal Audit Mendatang
+            </h4>
+            @if($auditStats['upcoming_audits']->isNotEmpty())
+                <div class="space-y-3">
+                    @foreach($auditStats['upcoming_audits'] as $scheduled)
+                    <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-white transition-all border border-transparent hover:border-gray-50">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 flex items-center justify-center text-emerald-500 flex-shrink-0">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-black text-gray-700 truncate">{{ $scheduled->title }}</p>
+                            <p class="text-[10px] font-bold text-gray-400">
+                                @if($scheduled->next_audit_date)
+                                    <i class="fas fa-redo-alt text-[8px] mr-1"></i> {{ $scheduled->frequency_label }} · Next: {{ $scheduled->next_audit_date->format('d M Y') }}
+                                @else
+                                    <i class="fas fa-calendar text-[8px] mr-1"></i> {{ $scheduled->audit_date->format('d M Y') }}
+                                @endif
+                            </p>
+                        </div>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[8px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Open
+                        </span>
+                    </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="py-10 text-center">
+                    <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar-check text-2xl text-gray-200"></i>
+                    </div>
+                    <p class="text-sm font-black text-gray-400">Tidak Ada Audit Terjadwal</p>
+                    <p class="text-[10px] font-bold text-gray-300 mt-1">Buat audit berkala untuk monitoring rutin</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Audit History Chart -->
+    @if(!empty($auditStats['history_months']))
+    <div class="mt-6 bg-white/70 rounded-2xl p-5 border border-gray-50">
+        <h4 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-bar text-indigo-300"></i> Riwayat Audit 6 Bulan
+        </h4>
+        <div class="flex items-end gap-3 h-32">
+            @foreach($auditStats['history_months'] as $i => $month)
+            @php
+                $total = $auditStats['history_total'][$i] ?? 0;
+                $completed = $auditStats['history_completed'][$i] ?? 0;
+                $maxVal = max($auditStats['history_total']) ?: 1;
+                $heightPct = ($total / $maxVal) * 100;
+                $monthLabel = \Carbon\Carbon::parse($month.'-01')->format('M');
+            @endphp
+            <div class="flex-1 flex flex-col items-center gap-2">
+                <div class="relative w-full flex flex-col items-center justify-end" style="height: 120px;">
+                    <div class="w-full max-w-[40px] rounded-t-xl transition-all duration-500 bg-indigo-500/20 relative" style="height: {{ $heightPct }}%">
+                        <div class="absolute bottom-0 left-0 right-0 rounded-t-xl bg-indigo-500 transition-all duration-500" style="height: {{ $completed > 0 ? ($completed / $total) * 100 : 0 }}%"></div>
+                    </div>
+                </div>
+                <span class="text-[9px] font-black text-gray-400">{{ $monthLabel }}</span>
+                <span class="text-[8px] font-bold text-gray-300">{{ $total }}</span>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+</div>
+
 <!-- Recent Assets -->
 <div class="glass-card rounded-[2rem] shadow-sm overflow-hidden relative border-t-2 border-l-2 border-white/80 group/table -mt-2">
     <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-50/40 rounded-full filter blur-[4rem] opacity-50 -z-10 animate-blob pointer-events-none"></div>

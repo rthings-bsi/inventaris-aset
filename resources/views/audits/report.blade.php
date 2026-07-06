@@ -58,14 +58,33 @@
     <div class="glass-card rounded-[2rem] p-8 bg-slate-900 shadow-xl shadow-slate-200 relative overflow-hidden group hover:-translate-y-1 transition-all">
         <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:scale-150 transition-all duration-700"></div>
         <div class="relative z-10">
-            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Total Stock Sistem</p>
-            <h2 class="text-4xl font-black text-white">{{ $foundItems->count() + $missingAssets->count() }}</h2>
-            <div class="mt-4 flex items-center gap-2 text-[10px] font-bold text-slate-500">
-                <i class="fas fa-database text-indigo-400"></i> Database Snapshot
+            <p class="text-[10px] font-black uppercase tracking-widest text-white/60 mb-1">Rata-rata Score</p>
+            <h2 class="text-4xl font-black text-white">{{ $foundItems->avg('condition_score') ? number_format($foundItems->avg('condition_score'), 1) : '—' }}<span class="text-lg text-white/40">%</span></h2>
+            <div class="mt-4 flex items-center gap-2 text-[10px] font-bold text-white/40">
+                <i class="fas fa-chart-line"></i> Kualitas Aset
             </div>
         </div>
     </div>
 </div>
+
+<!-- Grade Breakdown -->
+@if(!empty($gradeBreakdown))
+<div class="glass-card rounded-[2rem] p-8 mb-8">
+    <h3 class="text-sm font-black text-indigo-400 uppercase tracking-widest flex items-center gap-2 mb-6">
+        <i class="fas fa-layer-group"></i> Breakdown Kondisi Aset
+    </h3>
+    <div class="grid grid-cols-5 gap-4">
+        @foreach(['A' => 'Baik Sekali', 'B' => 'Baik', 'C' => 'Cukup', 'D' => 'Rusak Ringan', 'E' => 'Rusak Berat'] as $grade => $label)
+        @php $count = $gradeBreakdown[$grade] ?? 0; @endphp
+        <div class="text-center p-4 rounded-2xl {{ $grade === 'A' ? 'bg-emerald-50 border border-emerald-100' : ($grade === 'B' ? 'bg-blue-50 border border-blue-100' : ($grade === 'C' ? 'bg-amber-50 border border-amber-100' : ($grade === 'D' ? 'bg-orange-50 border border-orange-100' : 'bg-red-50 border border-red-100'))) }}">
+            <span class="text-3xl font-black {{ $grade === 'A' ? 'text-emerald-600' : ($grade === 'B' ? 'text-blue-600' : ($grade === 'C' ? 'text-amber-600' : ($grade === 'D' ? 'text-orange-600' : 'text-red-600'))) }}">{{ $grade }}</span>
+            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-1">{{ $label }}</p>
+            <p class="text-xl font-black text-gray-700 mt-1">{{ $count }}</p>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
 
 <div class="space-y-12 mb-24">
     <!-- Section Missing -->

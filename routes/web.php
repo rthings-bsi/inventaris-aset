@@ -83,7 +83,10 @@ Route::middleware('auth')->group(function () {
 	Route::get('audits', [App\Http\Controllers\AssetAuditController::class, 'index'])->name('audits.index');
 	Route::post('audits', [App\Http\Controllers\AssetAuditController::class, 'store'])->name('audits.store');
 	Route::get('audits/{audit}', [App\Http\Controllers\AssetAuditController::class, 'show'])->name('audits.show');
+	Route::get('audits/{audit}/checklist', [App\Http\Controllers\AssetAuditController::class, 'checklist'])->name('audits.checklist');
+	Route::post('audits/{audit}/checklist', [App\Http\Controllers\AssetAuditController::class, 'checklistUpdate'])->name('audits.checklist.update');
 	Route::post('audits/{audit}/scan', [App\Http\Controllers\AssetAuditController::class, 'scan'])->name('audits.scan');
+	Route::post('audits/{audit}/grade/{item}', [App\Http\Controllers\AssetAuditController::class, 'gradeItem'])->name('audits.grade');
 	Route::post('audits/{audit}/complete', [App\Http\Controllers\AssetAuditController::class, 'complete'])->name('audits.complete');
 	Route::get('audits/{audit}/report', [App\Http\Controllers\AssetAuditController::class, 'report'])->name('audits.report');
 	Route::get('audits/{audit}/export/excel', [App\Http\Controllers\AssetAuditController::class, 'exportExcel'])->name('audits.export.excel');

@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Seed Audit Criteria
+        $this->call(AuditCriteriaSeeder::class);
+
         // 1. Seed Roles
         $adminRole = \App\Models\Role::updateOrCreate(
             ['slug' => 'admin'],
