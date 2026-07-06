@@ -94,23 +94,12 @@
 
         <!-- Kalkulator Penyusutan (Depreciation) -->
         @php
-            $acquisition_cost = $asset->acquisition_cost;
-            $umur_ekonomis = 5; // Asumsi 5 tahun
-            $nilai_sisa = $acquisition_cost * 0.10; // 10% salvage value
-            
-            $tanggal_beli = \Carbon\Carbon::parse($asset->acquisition_date);
-            $sekarang = \Carbon\Carbon::now();
-            $total_bulan_berjalan = $tanggal_beli->diffInMonths($sekarang);
-            
-            // Maksimal penyusutan adalah 5 tahun (60 bulan)
-            $bulan_efektif = min($total_bulan_berjalan, $umur_ekonomis * 12);
-            
-            $penyusutan_per_bulan = ($acquisition_cost - $nilai_sisa) / ($umur_ekonomis * 12);
-            $total_penyusutan = $penyusutan_per_bulan * $bulan_efektif;
-            $nilai_sekarang = $acquisition_cost - $total_penyusutan;
-            
-            $persentase_nilai = $acquisition_cost > 0 ? ($nilai_sekarang / $acquisition_cost) * 100 : 0;
-            $warna_progress = $persentase_nilai > 50 ? 'bg-emerald-400' : ($persentase_nilai > 20 ? 'bg-amber-400' : 'bg-red-400');
+            $nilai_sekarang = $asset->book_value;
+            $penyusutan_total = $asset->accumulated_depreciation;
+            $persentase_nilai = $asset->depreciation_rate;
+            $warna_progress = $persentase_nilai < 50 ? 'bg-emerald-400' : ($persentase_nilai < 75 ? 'bg-amber-400' : 'bg-red-400');
+            $metode_label = $asset->depreciation_method === 'straight_line' ? 'Straight-Line' : 'Double-Declining';
+            $tahun_label = $asset->useful_life_years ? $asset->useful_life_years . ' Tahun' : 'Tidak diatur';
         @endphp
 
         <div class="bg-gradient-to-br from-indigo-700 via-purple-700 to-violet-800 rounded-[2rem] shadow-xl shadow-purple-500/20 overflow-hidden group/card hover:shadow-purple-500/40 transition-all animate-slide-down relative border border-white/10" style="animation-delay: 0.2s;">
@@ -119,32 +108,32 @@
                 <h2 class="text-xs sm:text-sm font-black text-purple-100 uppercase tracking-widest flex items-center gap-2 drop-shadow-sm w-full sm:w-auto">
                     <i class="fas fa-chart-line text-purple-300"></i> Valuasi & Penyusutan
                 </h2>
-                <span class="text-[9px] font-bold text-white uppercase bg-white/20 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20">Straight-Line 5Y</span>
+                <span class="text-[9px] font-bold text-white uppercase bg-white/20 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/20">{{ $metode_label }} {{ $tahun_label }}</span>
             </div>
             <div class="p-5 sm:p-6 relative z-10">
                 <!-- Nilai Beli -->
                 <div class="mb-4">
                     <p class="text-[10px] font-black tracking-widest uppercase text-purple-200 opacity-90 mb-1">Nilai Perolehan Awal</p>
                     <p class="text-xl font-bold text-white tracking-tight drop-shadow-md flex items-center">
-                        <span class="text-xs opacity-80 mr-1.5">Rp</span>{{ number_format($acquisition_cost, 0, ',', '.') }}
+                        <span class="text-xs opacity-80 mr-1.5">Rp</span>{{ number_format($asset->acquisition_cost, 0, ',', '.') }}
                     </p>
                 </div>
                 
                 <!-- Nilai Sekarang -->
                 <div class="mb-6 p-4 bg-white/10 rounded-2xl border border-white/10 backdrop-blur-md">
                     <p class="text-[10px] font-black tracking-widest uppercase text-emerald-300 mb-1 flex items-center gap-1.5">
-                        <i class="fas fa-coins"></i> Estimasi Nilai Saat Ini
+                        <i class="fas fa-coins"></i> Nilai Buku Saat Ini
                     </p>
                     <p class="text-3xl font-black text-white tracking-tight drop-shadow-md flex items-center">
                         <span class="text-sm opacity-80 mr-1.5">Rp</span>{{ number_format($nilai_sekarang, 0, ',', '.') }}
                     </p>
                     <div class="mt-3">
                         <div class="flex justify-between text-[9px] font-bold text-purple-200 mb-1.5 uppercase tracking-widest">
-                            <span>Kesehatan Valuasi</span>
+                            <span>Status Penyusutan</span>
                             <span>{{ number_format($persentase_nilai, 1) }}%</span>
                         </div>
                         <div class="w-full bg-black/20 rounded-full h-2 overflow-hidden border border-white/5">
-                            <div class="{{ $warna_progress }} h-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out" style="width: {{ $persentase_nilai }}%"></div>
+                            <div class="{{ $warna_progress }} h-2 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out" style="width: {{ min(100, $persentase_nilai) }}%"></div>
                         </div>
                     </div>
                 </div>
@@ -153,11 +142,19 @@
                 <div class="grid grid-cols-2 gap-3 mt-4 border-t border-white/10 pt-4">
                     <div>
                         <p class="text-[9px] font-bold uppercase tracking-widest text-purple-300 mb-1">Total Susut</p>
-                        <p class="text-xs font-black text-red-300">- Rp {{ number_format($total_penyusutan, 0, ',', '.') }}</p>
+                        <p class="text-xs font-black text-red-300">- Rp {{ number_format($penyusutan_total, 0, ',', '.') }}</p>
                     </div>
                     <div>
                         <p class="text-[9px] font-bold uppercase tracking-widest text-purple-300 mb-1">Masa Pakai</p>
-                        <p class="text-xs font-black text-white">{{ min($total_bulan_berjalan, 60) }} / 60 Bulan</p>
+                        <p class="text-xs font-black text-white">{{ $asset->useful_life_years ? $asset->years_elapsed . ' / ' . $asset->useful_life_years . ' Tahun' : 'Tidak ditentukan' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-purple-300 mb-1">Nilai Residu</p>
+                        <p class="text-xs font-black text-white">Rp{{ number_format($asset->residual_value ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-purple-300 mb-1">Depresiasi/Tahun</p>
+                        <p class="text-xs font-black text-white">Rp{{ number_format($asset->annual_depreciation, 0, ',', '.') }}</p>
                     </div>
                 </div>
             </div>

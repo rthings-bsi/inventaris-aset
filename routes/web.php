@@ -79,6 +79,12 @@ Route::middleware('auth')->group(function () {
 	// Notifications
 	Route::post('notifications/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
 
+	// Repairs
+	Route::get('repairs', [App\Http\Controllers\AssetRepairController::class, 'index'])->name('repairs.index');
+	Route::post('repairs', [App\Http\Controllers\AssetRepairController::class, 'store'])->name('repairs.store');
+	Route::put('repairs/{repair}', [App\Http\Controllers\AssetRepairController::class, 'update'])->name('repairs.update');
+	Route::delete('repairs/{repair}', [App\Http\Controllers\AssetRepairController::class, 'destroy'])->name('repairs.destroy');
+
 	// Audits
 	Route::get('audits', [App\Http\Controllers\AssetAuditController::class, 'index'])->name('audits.index');
 	Route::post('audits', [App\Http\Controllers\AssetAuditController::class, 'store'])->name('audits.store');

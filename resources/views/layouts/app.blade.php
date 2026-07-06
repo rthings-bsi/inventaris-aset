@@ -498,6 +498,18 @@
                     @endif
                 </span>
             </a>
+            <!-- Perbaikan & Perawatan -->
+            <a href="{{ route('repairs.index') }}" class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[14.5px] font-bold transition-all duration-300 whitespace-nowrap group {{ request()->routeIs('repairs.*') ? 'bg-gradient-to-r from-amber-50/80 via-orange-50/80 to-amber-50/80 bg-[length:200%_200%] animate-gradient-shift text-amber-700 shadow-sm border border-amber-100/60' : 'text-gray-500 hover:bg-white hover:text-amber-600 hover:shadow-sm hover:translate-x-1.5 border border-transparent' }} sidebar-item">
+                <div class="w-8 flex justify-center transition-transform duration-300 {{ request()->routeIs('repairs.*') ? 'text-amber-600 scale-110' : 'text-gray-400 group-hover:text-amber-500' }}">
+                    <i class="fas fa-tools text-lg"></i>
+                </div>
+                <span class="sidebar-text transition-opacity duration-200 flex items-center gap-2">
+                    Perbaikan & Perawatan
+                    @if(request()->routeIs('repairs.*'))
+                        <div class="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></div>
+                    @endif
+                </span>
+            </a>
         </nav>
 
         <!-- Sidebar Footer / Auth -->

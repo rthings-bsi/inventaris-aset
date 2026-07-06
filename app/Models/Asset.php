@@ -20,6 +20,9 @@ class Asset extends Model
         'description',
         'id_categories',
         'acquisition_cost',
+        'residual_value',
+        'useful_life_years',
+        'depreciation_method',
         'acquisition_date',
         'condition',
         'id_locations',
@@ -31,10 +34,11 @@ class Asset extends Model
 
     protected $casts = [
         'acquisition_date' => 'date',
-        'acquisition_cost' => 'decimal:2'
+        'acquisition_cost' => 'decimal:2',
+        'residual_value' => 'decimal:2',
     ];
 
-    // Filter dinamis untuk menggantikan duplikasi di Controller
+    // ─── Scopes ──────────────────────────────────────────────
     public function scopeFilter($query, array $filters)
     {
         $query->when($filters['category'] ?? false, function ($query, $category) {
@@ -43,6 +47,10 @@ class Asset extends Model
 
         $query->when($filters['status'] ?? false, function ($query, $status) {
             $query->where('status', $status);
+        });
+
+        $query->when($filters['condition'] ?? false, function ($query, $condition) {
+            $query->where('condition', $condition);
         });
 
         $query->when($filters['search'] ?? false, function ($query, $search) {
@@ -64,6 +72,7 @@ class Asset extends Model
         });
     }
 
+    // ─── Relationships ───────────────────────────────────────
     public function loans()
     {
         return $this->hasMany(AssetLoan::class, 'id_assets', 'id_assets');
@@ -82,6 +91,84 @@ class Asset extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'id_users', 'id_users');
+    }
+
+    public function repairs()
+    {
+        return $this->hasMany(AssetRepair::class, 'id_assets');
+    }
+
+    // ─── Depreciation ────────────────────────────────────────
+    public function getDepreciableValueAttribute(): float
+    {
+        $residual = $this->residual_value ?? 0;
+        return max(0, $this->acquisition_cost - $residual);
+    }
+
+    public function getAnnualDepreciationAttribute(): float
+    {
+        if (!$this->useful_life_years || $this->useful_life_years <= 0) return 0;
+        return $this->depreciable_value / $this->useful_life_years;
+    }
+
+    public function getYearsElapsedAttribute(): float
+    {
+        if (!$this->acquisition_date) return 0;
+        return max(0, now()->diffInYears($this->acquisition_date, true));
+    }
+
+    public function getAccumulatedDepreciationAttribute(): float
+    {
+        $years = $this->years_elapsed;
+        if ($this->depreciation_method === 'straight_line') {
+            return min($this->depreciable_value, $this->annual_depreciation * $years);
+        }
+        // double-declining
+        if ($this->depreciation_method === 'double_declining') {
+            $rate = (2 / max(1, $this->useful_life_years));
+            $acc = 0;
+            $bookValue = $this->acquisition_cost;
+            for ($y = 0; $y < floor($years); $y++) {
+                $depr = min($bookValue - ($this->residual_value ?? 0), $bookValue * $rate);
+                $acc += $depr;
+                $bookValue -= $depr;
+                if ($bookValue <= ($this->residual_value ?? 0)) break;
+            }
+            // Partial year
+            $partial = $years - floor($years);
+            if ($partial > 0 && $bookValue > ($this->residual_value ?? 0)) {
+                $depr = min($bookValue - ($this->residual_value ?? 0), $bookValue * $rate * $partial);
+                $acc += $depr;
+            }
+            return $acc;
+        }
+        return 0;
+    }
+
+    public function getBookValueAttribute(): float
+    {
+        return max($this->residual_value ?? 0, $this->acquisition_cost - $this->accumulated_depreciation);
+    }
+
+    public function getDepreciationRateAttribute(): float
+    {
+        if ($this->acquisition_cost <= 0) return 0;
+        return round(($this->accumulated_depreciation / $this->acquisition_cost) * 100, 1);
+    }
+
+    public function getDepreciationStatusAttribute(): string
+    {
+        if (!$this->useful_life_years) return 'not_set';
+        $rate = $this->depreciation_rate;
+        if ($rate >= 100) return 'fully_depreciated';
+        if ($rate >= 75) return 'near_fully';
+        if ($rate >= 50) return 'half';
+        return 'active';
+    }
+
+    public function getTotalRepairCostAttribute(): float
+    {
+        return (float) $this->repairs()->sum('cost');
     }
 
     public function getActivitylogOptions(): LogOptions

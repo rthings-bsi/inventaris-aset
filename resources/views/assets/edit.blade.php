@@ -96,6 +96,39 @@
                 @enderror
             </div>
 
+            <!-- Nilai Residu -->
+            <div class="group/input pt-2">
+                <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Nilai Residu / Sisa</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <span class="text-indigo-400 font-black">Rp</span>
+                    </div>
+                    <input type="number" name="residual_value" value="{{ old('residual_value', $asset->residual_value) }}" 
+                           class="w-full pl-14 pr-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 placeholder-gray-400 outline-none"
+                           placeholder="Nilai setelah masa manfaat (0)" min="0">
+                </div>
+                <p class="text-[10px] font-black text-gray-400 mt-2 px-1 uppercase tracking-wider">* Nilai aset di akhir masa pakai</p>
+            </div>
+
+            <!-- Masa Manfaat & Metode -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+                <div class="group/input">
+                    <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Masa Manfaat (Tahun)</label>
+                    <input type="number" name="useful_life_years" value="{{ old('useful_life_years', $asset->useful_life_years) }}" 
+                           class="w-full px-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 outline-none"
+                           placeholder="Contoh: 5" min="1">
+                    <p class="text-[10px] font-black text-gray-400 mt-2 px-1 uppercase tracking-wider">* Estimasi umur ekonomis aset</p>
+                </div>
+                <div class="group/input">
+                    <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Metode Depresiasi</label>
+                    <select name="depreciation_method" class="w-full px-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-700 outline-none appearance-none cursor-pointer">
+                        <option value="straight_line" {{ $asset->depreciation_method == 'straight_line' ? 'selected' : '' }}>Garis Lurus (Straight-Line)</option>
+                        <option value="double_declining" {{ $asset->depreciation_method == 'double_declining' ? 'selected' : '' }}>Saldo Menurun Ganda (Double-Declining)</option>
+                    </select>
+                    <p class="text-[10px] font-black text-gray-400 mt-2 px-1 uppercase tracking-wider">* Metode perhitungan penyusutan</p>
+                </div>
+            </div>
+
             <!-- Tanggal Perolehan -->
             <div class="group/input pt-2">
                 <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Tanggal Pembelian <span class="text-pink-500">*</span></label>
