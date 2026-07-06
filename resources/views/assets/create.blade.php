@@ -25,18 +25,19 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <!-- Kode Aset -->
             <div class="group/input relative pb-1">
-                <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Referensi / Kode Aset <span class="text-pink-500">*</span></label>
+                <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest group-hover/input:text-indigo-600 transition-colors">Kode Aset <span class="text-emerald-500">(Otomatis)</span></label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
-                        <i class="fas fa-qrcode text-indigo-300 group-hover/input:text-indigo-500 transition-colors"></i>
+                        <i class="fas fa-qrcode text-indigo-300"></i>
                     </div>
-                    <input type="text" name="asset_code" value="{{ old('asset_code') }}" 
-                           class="w-full pl-12 pr-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 placeholder-gray-400 outline-none @error('asset_code') border-red-300 bg-red-50 focus:border-red-500 @enderror"
-                           placeholder="Contoh: AST-2023-001" required>
+                    <div class="w-full pl-12 pr-5 py-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-100 rounded-2xl text-[15px] font-black text-emerald-700 flex items-center">
+                        <span id="code-preview">Pilih kategori untuk generate kode</span>
+                    </div>
+                    <input type="hidden" name="asset_code" id="asset-code-input" value="">
                 </div>
-                @error('asset_code')
-                    <p class="text-red-500 text-xs font-bold mt-2 animate-bounce-sm px-1"><i class="fas fa-info-circle mr-1"></i> {{ $message }}</p>
-                @enderror
+                <p class="text-[10px] font-black text-gray-400 mt-2 px-1 uppercase tracking-wider flex items-center gap-1">
+                    <i class="fas fa-magic text-emerald-400"></i> Format: <strong>{PREFIX KATEGORI}-{TAHUNBULAN}-{NOMOR}</strong> · digenerate otomatis
+                </p>
             </div>
 
             <!-- Nama Aset -->
@@ -62,11 +63,11 @@
                     <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
                         <i class="fas fa-layer-group text-indigo-300 group-hover/input:text-indigo-500 transition-colors"></i>
                     </div>
-                    <select name="id_categories" required
+                    <select name="id_categories" required onchange="updateCodePreview(this)"
                             class="w-full pl-12 pr-10 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:ring-0 focus:bg-white focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all text-[15px] font-bold text-gray-800 appearance-none cursor-pointer outline-none @error('id_categories') border-red-300 bg-red-50 focus:border-red-500 @enderror">
                         <option value="">Pilihan Category</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id_categories }}" {{ old('id_categories') == $category->id_categories ? 'selected' : '' }}>{{ $category->category_name }}</option>
+                            <option value="{{ $category->id_categories }}" data-prefix="{{ $category->code_prefix ?? App\Models\Category::generatePrefix($category->category_name) }}" {{ old('id_categories') == $category->id_categories ? 'selected' : '' }}>{{ $category->category_name }}</option>
                         @endforeach
                     </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-indigo-400">
@@ -266,4 +267,52 @@
         </div>
     </form>
 </div>
+
+<!-- Auto-code preview -->
+<script>
+function updateCodePreview(select) {
+    const preview = document.getElementById('code-preview');
+    const input = document.getElementById('asset-code-input');
+    const catId = select.value;
+    
+    if (!catId) {
+        preview.textContent = 'Pilih kategori untuk generate kode';
+        preview.className = '';
+        input.value = '';
+        return;
+    }
+
+    // Use the selected option's prefix to show an estimated code immediately
+    const option = select.options[select.selectedIndex];
+    const prefix = option.dataset.prefix || 'AST';
+    const now = new Date();
+    const ym = now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0');
+    preview.textContent = prefix + '-' + ym + '-XXXX (memuat...)';
+    preview.className = 'text-amber-600';
+
+    // Fetch the actual next code from server
+    fetch('/assets/preview-code/' + catId)
+        .then(r => r.json())
+        .then(data => {
+            preview.textContent = data.code;
+            preview.className = 'text-emerald-700 font-black tracking-wider';
+            input.value = data.code;
+        })
+        .catch(() => {
+            // Fallback: use client-side estimation
+            const fallback = prefix + '-' + ym + '-0001';
+            preview.textContent = fallback + ' (estimasi)';
+            preview.className = 'text-amber-600';
+            input.value = fallback;
+        });
+}
+
+// Auto-trigger if category pre-selected (e.g. after validation error)
+document.addEventListener('DOMContentLoaded', function() {
+    const catSelect = document.querySelector('select[name="id_categories"]');
+    if (catSelect && catSelect.value) {
+        updateCodePreview(catSelect);
+    }
+});
+</script>
 @endsection

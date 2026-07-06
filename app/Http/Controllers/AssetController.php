@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Http\Requests\StoreAssetRequest;
 use App\Http\Requests\UpdateAssetRequest;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +47,9 @@ class AssetController extends Controller
     {
         $validated = $request->validated();
 
+        // Auto-generate asset code
+        $validated['asset_code'] = Asset::generateAssetCode($validated['id_categories']);
+
         // Handle file upload
         if ($request->hasFile('photo')) {
             $validated['photo'] = $request->file('photo')->store('assets', 'public');
@@ -54,6 +58,15 @@ class AssetController extends Controller
         Asset::create($validated);
 
         return redirect()->route('assets.index')->with('success', 'Aset berhasil ditambahkan!');
+    }
+
+    /**
+     * Preview auto-generated asset code for a category
+     */
+    public function previewCode(Category $category)
+    {
+        $code = Asset::previewAssetCode($category->id_categories);
+        return response()->json(['code' => $code, 'prefix' => $category->code_prefix]);
     }
 
     /**

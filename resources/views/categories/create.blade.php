@@ -21,8 +21,16 @@
         <div class="grid grid-cols-1 gap-y-6">
             <div class="group/input relative">
                 <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest">Nama Category <span class="text-pink-500">*</span></label>
-                <input type="text" name="category_name" value="{{ old('category_name') }}" required class="w-full px-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all font-bold outline-none @error('category_name') border-red-300 bg-red-50 focus:border-red-500 @enderror" placeholder="Contoh: Elektronik">
+                <input type="text" name="category_name" value="{{ old('category_name') }}" required class="w-full px-5 py-3.5 bg-gray-50/50 border-2 border-indigo-100 rounded-2xl focus:border-indigo-400 focus:shadow-lg focus:shadow-indigo-100 transition-all font-bold outline-none @error('category_name') border-red-300 bg-red-50 focus:border-red-500 @enderror" placeholder="Contoh: Elektronik" oninput="updatePrefix(this)">
                 @error('category_name') <p class="text-red-500 text-xs font-bold mt-2"><i class="fas fa-info-circle"></i> {{ $message }}</p> @enderror
+            </div>
+
+            <div class="group/input relative">
+                <label class="block text-xs font-black text-indigo-900 mb-2 uppercase tracking-widest">Kode Prefix <span class="text-emerald-500">(Otomatis)</span></label>
+                <div class="relative">
+                    <input type="text" name="code_prefix" id="code-prefix" value="{{ old('code_prefix') }}" maxlength="10" class="w-full px-5 py-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-100 rounded-2xl font-black text-emerald-700 outline-none uppercase tracking-widest" placeholder="Otomatis dari nama kategori" readonly>
+                </div>
+                <p class="text-[9px] font-bold text-gray-400 mt-1 flex items-center gap-1"><i class="fas fa-magic text-emerald-400"></i> Digunakan untuk format kode aset: <strong>{PREFIX}-{TAHUNBULAN}-{NOMOR}</strong></p>
             </div>
 
             <div class="group/input relative">
@@ -38,4 +46,17 @@
         </div>
     </form>
 </div>
+
+<script>
+function updatePrefix(input) {
+    const prefix = document.getElementById('code-prefix');
+    const name = input.value.trim();
+    if (name) {
+        const clean = name.replace(/[^A-Za-z]/g, '').toUpperCase().substring(0, 3);
+        prefix.value = clean;
+    } else {
+        prefix.value = '';
+    }
+}
+</script>
 @endsection

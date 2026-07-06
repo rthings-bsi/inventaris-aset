@@ -33,8 +33,13 @@ class CategoryController extends Controller
         abort_if(!auth()->user()->hasPermission('master-data.manage'), 403);
         $validated = $request->validate([
             'category_name' => 'required|string|max:255',
+            'code_prefix' => 'nullable|string|max:10|unique:categories,code_prefix',
             'description' => 'nullable|string',
         ]);
+
+        if (empty($validated['code_prefix'])) {
+            $validated['code_prefix'] = Category::generatePrefix($validated['category_name']);
+        }
 
         Category::create($validated);
 
@@ -52,8 +57,13 @@ class CategoryController extends Controller
         abort_if(!auth()->user()->hasPermission('master-data.manage'), 403);
         $validated = $request->validate([
             'category_name' => 'required|string|max:255',
+            'code_prefix' => 'nullable|string|max:10|unique:categories,code_prefix,' . $category->id_categories . ',id_categories',
             'description' => 'nullable|string',
         ]);
+
+        if (empty($validated['code_prefix'])) {
+            $validated['code_prefix'] = Category::generatePrefix($validated['category_name']);
+        }
 
         $category->update($validated);
 

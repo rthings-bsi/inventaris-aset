@@ -79,6 +79,9 @@ Route::middleware('auth')->group(function () {
 	// Notifications
 	Route::post('notifications/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
 
+	// Asset code preview API
+	Route::get('assets/preview-code/{category}', [App\Http\Controllers\AssetController::class, 'previewCode'])->name('assets.preview-code')->middleware('auth');
+
 	// Repairs
 	Route::get('repairs', [App\Http\Controllers\AssetRepairController::class, 'index'])->name('repairs.index');
 	Route::post('repairs', [App\Http\Controllers\AssetRepairController::class, 'store'])->name('repairs.store');

@@ -178,4 +178,29 @@ class Asset extends Model
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
+
+    // ─── Auto-generate Asset Code ─────────────────────────────
+    public static function generateAssetCode(int $categoryId): string
+    {
+        $category = Category::find($categoryId);
+        $prefix = $category->code_prefix ?? Category::generatePrefix($category->category_name ?? 'AST');
+        
+        $year = now()->format('Y');
+        $month = now()->format('m');
+        $ym = $year . $month;
+        
+        // Count existing assets with same prefix and year-month
+        $count = self::where('asset_code', 'like', "{$prefix}-{$ym}-%")->count();
+        $running = $count + 1;
+        
+        return "{$prefix}-{$ym}-" . str_pad($running, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get the next asset code without creating an asset
+     */
+    public static function previewAssetCode(int $categoryId): string
+    {
+        return self::generateAssetCode($categoryId);
+    }
 }
