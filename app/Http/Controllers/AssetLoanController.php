@@ -44,8 +44,10 @@ class AssetLoanController extends Controller
         }
 
         $assets = $query->get();
+        $categories = \App\Models\Category::has('assets')->get();
+        $groupedAssets = $assets->groupBy(fn($a) => $a->category->category_name ?? 'Tanpa Kategori');
             
-        return view('loans.create', compact('assets'));
+        return view('loans.create', compact('assets', 'categories', 'groupedAssets'));
     }
 
     public function store(Request $request)
