@@ -164,59 +164,150 @@
         <div class="glass-card rounded-[2rem] overflow-hidden group/card hover:shadow-[0_15px_40px_rgba(79,70,229,0.1)] transition-all border-t-2 border-l-2 border-white/80 animate-slide-down" style="animation-delay: 0.3s;">
             <div class="bg-gradient-to-r from-indigo-50/50 to-purple-50/50 px-5 sm:px-6 py-4 sm:py-5 border-b border-indigo-100/50 flex flex-wrap gap-2 justify-between items-center">
                 <h2 class="text-xs sm:text-sm font-black text-indigo-700 uppercase tracking-widest flex items-center gap-2">
-                    <i class="fas fa-history text-indigo-400"></i> Audit Trail
+                    <i class="fas fa-history text-indigo-400"></i> Riwayat Aktivitas
                 </h2>
                 <span class="text-[9px] font-bold text-indigo-400 uppercase bg-white px-2 py-1 rounded-lg shadow-sm border border-indigo-50">Log Sistem</span>
             </div>
-            <div class="p-5 sm:p-6 bg-white/40 max-h-64 overflow-y-auto">
-                <div class="space-y-4">
+            <div class="p-5 sm:p-6 bg-white/40 max-h-80 overflow-y-auto">
+                <div class="space-y-3">
                     @php
-                        // Memanggil logs yang tersimpan via Activitylog
-                        $activities = $asset->activities()->latest()->take(5)->get();
+                        $activities = $asset->activities()->latest()->take(10)->get();
+                        $fieldLabels = [
+                            'asset_code' => 'Kode Aset',
+                            'asset_name' => 'Nama Aset',
+                            'description' => 'Deskripsi',
+                            'id_categories' => 'Kategori',
+                            'id_locations' => 'Lokasi',
+                            'id_users' => 'PIC / Pengguna',
+                            'person_in_charge' => 'Penanggung Jawab',
+                            'acquisition_cost' => 'Nilai Perolehan',
+                            'acquisition_date' => 'Tanggal Perolehan',
+                            'condition' => 'Kondisi / Grade',
+                            'status' => 'Status Operasional',
+                            'photo' => 'Foto Aset',
+                            'residual_value' => 'Nilai Residu',
+                            'useful_life_years' => 'Masa Manfaat',
+                            'depreciation_method' => 'Metode Depresiasi',
+                            'created_at' => 'Waktu Dibuat',
+                            'updated_at' => 'Waktu Update',
+                            'id_assets' => 'Aset',
+                            'loan_date' => 'Tanggal Pinjam',
+                            'return_date' => 'Tanggal Kembali',
+                            'reject_reason' => 'Alasan Penolakan',
+                            'id_asset_loans' => 'Referensi Peminjaman',
+                            'repair_date' => 'Tanggal Perbaikan',
+                            'repair_type' => 'Tipe Perbaikan',
+                            'cost' => 'Biaya',
+                            'vendor' => 'Vendor',
+                            'new_condition_grade' => 'Grade Baru',
+                            'handover_notes' => 'Catatan Serah Terima',
+                        ];
+                        $valueLabels = [
+                            'active' => 'Aktif / Siap Digunakan',
+                            'maintenance' => 'Dalam Perawatan',
+                            'broken' => 'Rusak',
+                            'disposed' => 'Dihapuskan',
+                            'A' => 'A — Baik Sekali',
+                            'B' => 'B — Baik',
+                            'C' => 'C — Cukup',
+                            'D' => 'D — Rusak Ringan',
+                            'E' => 'E — Rusak Berat',
+                            'straight_line' => 'Garis Lurus',
+                            'double_declining' => 'Saldo Menurun Ganda',
+                            'damage' => 'Kerusakan',
+                            'maintenance' => 'Perawatan',
+                            'warranty' => 'Garansi',
+                            'reported' => 'Dilaporkan',
+                            'in_progress' => 'Dalam Proses',
+                            'completed' => 'Selesai',
+                            'approved' => 'Disetujui QC',
+                            'handed_over' => 'Serah Terima',
+                        ];
                     @endphp
                     
                     @forelse($activities as $activity)
-                    <div class="flex gap-3 text-sm">
-                        <div class="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-400 flex-shrink-0">
-                            @if($activity->description == 'created')
-                                <i class="fas fa-plus text-xs"></i>
-                            @elseif($activity->description == 'updated')
-                                <i class="fas fa-pen text-xs"></i>
-                            @elseif($activity->description == 'deleted')
-                                <i class="fas fa-trash text-xs text-red-400"></i>
-                            @else
-                                <i class="fas fa-bolt text-xs"></i>
-                            @endif
+                    @php
+                        $actionIcons = ['created' => 'fa-plus-circle text-emerald-500', 'updated' => 'fa-pen-circle text-indigo-500', 'deleted' => 'fa-trash-alt text-red-500'];
+                        $actionLabels = ['created' => 'Aset Baru Ditambahkan', 'updated' => 'Data Aset Diperbarui', 'deleted' => 'Aset Dihapus'];
+                        $iconClass = $actionIcons[$activity->description] ?? 'fa-bolt text-gray-400';
+                        $actionLabel = $actionLabels[$activity->description] ?? ucfirst($activity->description);
+                        $timeAgo = $activity->created_at->diffForHumans();
+                        if ($timeAgo === '0 seconds ago') $timeAgo = 'Baru saja';
+                        elseif (str_starts_with($timeAgo, '1 seconds ago')) $timeAgo = 'Baru saja';
+                        $changes = $activity->changes();
+                    @endphp
+                    <div class="flex gap-3 p-3 rounded-2xl transition-all {{ $activity->description === 'created' ? 'bg-emerald-50/30 border border-emerald-50' : ($activity->description === 'deleted' ? 'bg-red-50/30 border border-red-50' : 'hover:bg-indigo-50/20') }}">
+                        <div class="w-9 h-9 rounded-xl bg-white shadow-sm border flex items-center justify-center flex-shrink-0 {{ $activity->description === 'created' ? 'border-emerald-100 text-emerald-500' : ($activity->description === 'deleted' ? 'border-red-100 text-red-500' : 'border-indigo-100 text-indigo-500') }}">
+                            <i class="fas {{ $iconClass }} text-sm"></i>
                         </div>
-                        <div class="flex-1">
-                            <p class="text-xs font-bold text-gray-800 uppercase tracking-wide">
-                                Aksi: {{ $activity->description }}
-                            </p>
-                            <p class="text-[10px] text-gray-500 mt-0.5">
-                                {{ $activity->created_at->diffForHumans() }}
-                                @if($activity->causer)
-                                    oleh <span class="text-indigo-600 font-bold border-b border-indigo-100">{{ $activity->causer->name }}</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-xs font-black text-gray-800">{{ $actionLabel }}</p>
+                                <span class="text-[9px] font-bold text-gray-400 whitespace-nowrap">{{ $timeAgo }}</span>
+                            </div>
+                            @if($activity->causer)
+                            <p class="text-[10px] font-bold text-gray-500 mt-0.5">
+                                Oleh <span class="text-indigo-600 font-black">{{ $activity->causer->name }}</span>
+                                @if($activity->causer->role_display_name)
+                                    <span class="text-gray-400 font-normal">({{ $activity->causer->role_display_name }})</span>
                                 @endif
                             </p>
-                            @if($activity->changes()->count() > 0 && $activity->description == 'updated')
-                                <div class="mt-2 bg-indigo-50/50 rounded-lg p-2 border border-indigo-100/50">
-                                    <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1">Perubahan Atribut:</p>
-                                    <ul class="text-[10px] text-gray-600 space-y-1">
-                                        @foreach($activity->changes()['attributes'] as $key => $value)
-                                            <li class="flex items-start gap-1">
-                                                <i class="fas fa-caret-right text-indigo-300 mt-0.5"></i> 
-                                                <span class="font-semibold">{{ $key }}</span> dimodifikasi
-                                            </li>
-                                        @endforeach
-                                    </ul>
+                            @endif
+
+                            @if($activity->description === 'updated' && isset($changes['attributes']) && count($changes['attributes']) > 0)
+                            <div class="mt-2 space-y-1.5">
+                                @foreach($changes['attributes'] as $key => $newValue)
+                                @php
+                                    $label = $fieldLabels[$key] ?? $key;
+                                    $oldValue = $changes['old'][$key] ?? null;
+                                    if ($oldValue === null && $activity->description !== 'updated') continue;
+                                    $displayNew = $valueLabels[$newValue] ?? $newValue;
+                                    $displayOld = $oldValue !== null ? ($valueLabels[$oldValue] ?? $oldValue) : null;
+                                    if ($key === 'updated_at' || $key === 'created_at') continue;
+                                @endphp
+                                <div class="flex items-start gap-2 text-[11px]">
+                                    <i class="fas fa-arrow-right text-indigo-200 mt-1 text-[8px]"></i>
+                                    <div class="flex-1">
+                                        <span class="font-black text-gray-700">{{ $label }}:</span>
+                                        @if($displayOld !== null && $displayOld !== $displayNew)
+                                            <span class="line-through text-gray-400 font-bold mx-1">{{ is_array($displayOld) ? json_encode($displayOld) : Str::limit($displayOld, 40) }}</span>
+                                            <i class="fas fa-long-arrow-alt-right text-amber-400 mx-1 text-[10px]"></i>
+                                        @endif
+                                        <span class="font-black {{ $activity->description === 'deleted' ? 'text-red-500' : 'text-emerald-600' }}">
+                                            {{ is_array($displayNew) ? json_encode($displayNew) : Str::limit($displayNew, 40) }}
+                                        </span>
+                                    </div>
                                 </div>
+                                @endforeach
+                            </div>
+                            @endif
+
+                            @if($activity->description === 'created' && isset($changes['attributes']))
+                            <div class="mt-2 flex flex-wrap gap-1.5">
+                                @foreach(array_slice($changes['attributes'], 0, 5) as $key => $value)
+                                @php
+                                    $label = $fieldLabels[$key] ?? $key;
+                                    $displayVal = $valueLabels[$value] ?? $value;
+                                    if (in_array($key, ['created_at', 'updated_at', 'id'])) continue;
+                                @endphp
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-lg text-[9px] font-bold border border-emerald-100">
+                                    {{ $label }}: <strong>{{ is_array($displayVal) ? '...' : Str::limit($displayVal, 25) }}</strong>
+                                </span>
+                                @endforeach
+                                @if(count($changes['attributes']) > 5)
+                                    <span class="text-[9px] font-bold text-gray-400">+{{ count($changes['attributes']) - 5 }} lainnya</span>
+                                @endif
+                            </div>
                             @endif
                         </div>
                     </div>
                     @empty
-                    <div class="text-center py-4">
-                        <i class="fas fa-ghost text-gray-300 text-3xl mb-2"></i>
-                        <p class="text-xs font-bold text-gray-400">Belum ada riwayat tercatat</p>
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-history text-2xl text-gray-200"></i>
+                        </div>
+                        <p class="text-sm font-black text-gray-400">Belum Ada Riwayat</p>
+                        <p class="text-[10px] font-bold text-gray-300 mt-1">Setiap perubahan data aset akan tercatat di sini</p>
                     </div>
                     @endforelse
                 </div>
