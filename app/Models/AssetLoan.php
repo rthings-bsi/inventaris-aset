@@ -32,4 +32,42 @@ class AssetLoan extends Model
     {
         return $this->belongsTo(User::class, 'id_users', 'id_users');
     }
+
+    public function repairs()
+    {
+        return $this->hasMany(AssetRepair::class, 'id_asset_loans');
+    }
+
+    /** Total biaya perbaikan selama peminjaman ini */
+    public function getTotalRepairCostAttribute(): float
+    {
+        return (float) $this->repairs()->sum('cost');
+    }
+
+    /** Estimasi biaya depresiasi selama periode peminjaman */
+    public function getDepreciationCostAttribute(): float
+    {
+        if (!$this->asset || !$this->asset->annual_depreciation || !$this->loan_date) {
+            return 0;
+        }
+        $start = $this->loan_date;
+        $end = $this->return_date ?? now();
+        $days = $start->diffInDays($end);
+        $annualDepr = $this->asset->annual_depreciation;
+        return ($annualDepr / 365) * $days;
+    }
+
+    /** Total biaya (depresiasi + perbaikan) */
+    public function getTotalCostAttribute(): float
+    {
+        return $this->depreciation_cost + $this->total_repair_cost;
+    }
+
+    /** Durasi peminjaman dalam hari */
+    public function getDurationDaysAttribute(): int
+    {
+        $start = $this->loan_date;
+        $end = $this->return_date ?? now();
+        return max(1, $start->diffInDays($end));
+    }
 }

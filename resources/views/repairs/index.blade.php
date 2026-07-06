@@ -65,6 +65,7 @@
                     <th class="p-4">Tipe</th>
                     <th class="p-4 text-right">Biaya</th>
                     <th class="p-4">Vendor</th>
+                    <th class="p-4">Loan Ref</th>
                     <th class="p-4 text-center">Status</th>
                     <th class="p-4 text-right">Aksi</th>
                 </tr>
@@ -92,6 +93,15 @@
                     </td>
                     <td class="p-4 text-right font-black text-gray-700">Rp{{ number_format($repair->cost, 0, ',', '.') }}</td>
                     <td class="p-4 text-sm font-bold text-gray-500">{{ $repair->vendor ?: '-' }}</td>
+                    <td class="p-4">
+                        @if($repair->loan)
+                            <a href="{{ route('loans.index') }}" class="text-[10px] font-bold text-indigo-500 hover:underline inline-flex items-center gap-1">
+                                <i class="fas fa-link text-[8px]"></i> Loan #{{ $repair->loan->id_asset_loans }}
+                            </a>
+                        @else
+                            <span class="text-gray-200">—</span>
+                        @endif
+                    </td>
                     <td class="p-4 text-center">
                         @if($repair->status === 'completed')
                             <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-100">Selesai</span>

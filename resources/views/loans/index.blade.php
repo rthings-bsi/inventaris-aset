@@ -33,7 +33,9 @@
                     @if(auth()->user()->hasPermission('loan.manage'))
                         <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100">Peminjam</th>
                     @endif
-                    <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100">Tanggal Pengajuan</th>
+                    <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100">Tanggal</th>
+                    <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100 text-center">Grade</th>
+                    <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100 text-right">Biaya Reparasi</th>
                     <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100">Status</th>
                     <th class="p-4 text-xs font-black text-indigo-400 uppercase tracking-widest border-b border-gray-100 text-center">Aksi</th>
                 </tr>
@@ -69,6 +71,28 @@
                         <td class="p-4">
                             <span class="text-sm font-bold text-gray-700">{{ $loan->created_at->format('d M Y') }}</span>
                             <p class="text-[10px] text-gray-500 font-bold uppercase">{{ $loan->created_at->format('H:i') }} WIB</p>
+                        </td>
+                        <td class="p-4 text-center">
+                            @if($loan->asset)
+                                @php $g = $loan->asset->condition; @endphp
+                                <span class="inline-flex items-center justify-center w-7 h-7 rounded-xl text-[11px] font-black {{ $g === 'A' ? 'bg-emerald-100 text-emerald-700' : ($g === 'B' ? 'bg-blue-100 text-blue-700' : ($g === 'C' ? 'bg-amber-100 text-amber-700' : ($g === 'D' ? 'bg-orange-100 text-orange-700' : ($g === 'E' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400')))) }}">
+                                    {{ $g ?? '?' }}
+                                </span>
+                            @else
+                                <span class="text-gray-200">—</span>
+                            @endif
+                        </td>
+                        <td class="p-4 text-right">
+                            <div class="flex flex-col items-end">
+                                @if($loan->total_repair_cost > 0)
+                                    <span class="text-sm font-black text-rose-600">Rp{{ number_format($loan->total_repair_cost, 0, ',', '.') }}</span>
+                                @else
+                                    <span class="text-sm font-bold text-gray-300">—</span>
+                                @endif
+                                @if($loan->status === 'returned' || $loan->status === 'borrowed')
+                                    <span class="text-[9px] font-bold text-gray-400">Depr: Rp{{ number_format($loan->depreciation_cost, 0, ',', '.') }}</span>
+                                @endif
+                            </div>
                         </td>
                         <td class="p-4">
                             @if($loan->status == 'pending')

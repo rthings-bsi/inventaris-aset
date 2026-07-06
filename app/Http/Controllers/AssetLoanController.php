@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Asset;
 use App\Models\AssetLoan;
+use App\Models\AssetRepair;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -37,9 +38,9 @@ class AssetLoanController extends Controller
             })
             ->latest();
 
-        // Regular users can only borrow assets with condition 'Baik Sekali' (Grade A) or 'Baik' (Grade B)
+        // Regular users can only borrow assets with condition 'A' or 'B' (Grade A/B)
         if (!Auth::user()->isAdmin()) {
-            $query->whereIn('condition', ['Baik Sekali', 'Baik']);
+            $query->whereIn('condition', ['A', 'B']);
         }
 
         $assets = $query->get();
@@ -59,7 +60,7 @@ class AssetLoanController extends Controller
         $asset = Asset::findOrFail($request->id_assets);
 
         // Regular users (without manage permission) can only borrow Grade A/B
-        if (!Auth::user()->hasPermission('loan.manage') && !in_array($asset->condition, ['Baik Sekali', 'Baik'])) {
+        if (!Auth::user()->hasPermission('loan.manage') && !in_array($asset->condition, ['A', 'B'])) {
             return back()->with('error', 'Anda hanya diizinkan untuk meminjam aset dengan kondisi Grade A atau B.');
         }
 
@@ -156,6 +157,21 @@ class AssetLoanController extends Controller
         $loan->asset->update([
             'id_users' => null
         ]);
+
+        // Auto-create repair record if asset condition is D or E (damaged)
+        if (in_array($loan->asset->condition, ['D', 'E'])) {
+            AssetRepair::create([
+                'id_assets' => $loan->asset->id_assets,
+                'id_asset_loans' => $loan->id_asset_loans,
+                'repair_date' => now(),
+                'description' => 'Kerusakan terdeteksi saat pengembalian aset dari peminjaman oleh ' . $loan->user->name,
+                'repair_type' => 'damage',
+                'cost' => 0,
+                'status' => 'pending',
+                'created_by' => auth()->id(),
+            ]);
+            session()->flash('warning', 'Aset dikembalikan dengan kondisi grade ' . $loan->asset->condition . '. Catatan perbaikan otomatis dibuat. Silakan update biaya perbaikan di menu Perbaikan & Perawatan.');
+        }
 
         $managers = User::whereIn('role', ['admin', 'supervisor'])->get();
         Notification::send($managers, new AssetLoanNotification($loan, 'returned', 'Unit aset ' . $loan->asset->asset_name . ' telah dikembalikan oleh ' . Auth::user()->name));

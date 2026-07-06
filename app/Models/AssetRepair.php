@@ -10,7 +10,7 @@ class AssetRepair extends Model
     protected $primaryKey = 'id_asset_repairs';
 
     protected $fillable = [
-        'id_assets', 'repair_date', 'description', 'repair_type',
+        'id_assets', 'id_asset_loans', 'repair_date', 'description', 'repair_type',
         'cost', 'vendor', 'notes', 'status', 'created_by'
     ];
 
@@ -22,6 +22,11 @@ class AssetRepair extends Model
     public function asset()
     {
         return $this->belongsTo(Asset::class, 'id_assets');
+    }
+
+    public function loan()
+    {
+        return $this->belongsTo(AssetLoan::class, 'id_asset_loans');
     }
 
     public function creator()

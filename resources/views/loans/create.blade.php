@@ -33,16 +33,52 @@
                     <i class="fas fa-boxes text-indigo-300"></i> Pilih Aset Operasional <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
-                    <select name="id_assets" required class="w-full pl-5 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100/50 text-sm font-bold text-gray-700 outline-none transition-all appearance-none cursor-pointer shadow-sm hover:border-indigo-300">
+                    <select name="id_assets" required class="w-full pl-5 pr-12 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100/50 text-sm font-bold text-gray-700 outline-none transition-all appearance-none cursor-pointer shadow-sm hover:border-indigo-300"
+                            onchange="updateAssetInfo(this)">
                         <option value="">Pilih Aset yang Tersedia...</option>
                         @foreach($assets as $asset)
-                            <option value="{{ $asset->id_assets }}">{{ $asset->asset_code }} - {{ $asset->asset_name }} [Status: {{ $asset->condition }}] ({{ $asset->category->category_name ?? 'Tanpa Kategori' }})</option>
+                            <option value="{{ $asset->id_assets }}" 
+                                data-condition="{{ $asset->condition }}"
+                                data-category="{{ $asset->category->category_name ?? '-' }}"
+                                data-location="{{ $asset->location->location_name ?? '-' }}"
+                                data-book-value="{{ $asset->book_value }}"
+                                data-depreciation="{{ $asset->annual_depreciation }}"
+                                data-depr-status="{{ $asset->depreciation_status }}">
+                                {{ $asset->asset_code }} - {{ $asset->asset_name }} [{{ $asset->condition }}]
+                            </option>
                         @endforeach
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pr-5 pointer-events-none text-indigo-400">
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
+
+                <!-- Selected Asset Info Panel -->
+                <div id="asset-info-panel" class="hidden mt-4 p-5 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-100/50 transition-all animate-fade-in-up">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Grade Kondisi</p>
+                            <span id="info-grade" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black"></span>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Kategori</p>
+                            <p id="info-category" class="text-sm font-bold text-gray-700">—</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Nilai Buku</p>
+                            <p id="info-book-value" class="text-sm font-bold text-gray-700">—</p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1">Depresiasi/Tahun</p>
+                            <p id="info-depreciation" class="text-sm font-bold text-gray-700">—</p>
+                        </div>
+                    </div>
+                    <div id="info-warning" class="hidden mt-3 p-3 bg-amber-50 border border-amber-100 rounded-xl text-xs font-bold text-amber-700 flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="info-warning-text"></span>
+                    </div>
+                </div>
+
                 @error('id_assets')
                     <p class="mt-2 text-xs font-bold text-red-500"><i class="fas fa-exclamation-circle"></i> {{ $message }}</p>
                 @enderror
@@ -70,4 +106,55 @@
         </div>
     </form>
 </div>
+
+<script>
+function updateAssetInfo(select) {
+    const panel = document.getElementById('asset-info-panel');
+    const option = select.options[select.selectedIndex];
+    
+    if (!option || !option.value) {
+        panel.classList.add('hidden');
+        return;
+    }
+
+    panel.classList.remove('hidden');
+
+    // Grade
+    const grade = option.dataset.condition || '?';
+    const gradeColors = {
+        'A': 'bg-emerald-100 text-emerald-700 border border-emerald-200',
+        'B': 'bg-blue-100 text-blue-700 border border-blue-200',
+        'C': 'bg-amber-100 text-amber-700 border border-amber-200',
+        'D': 'bg-orange-100 text-orange-700 border border-orange-200',
+        'E': 'bg-red-100 text-red-700 border border-red-200'
+    };
+    const gradeEl = document.getElementById('info-grade');
+    gradeEl.textContent = 'Grade ' + grade;
+    gradeEl.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black ' + (gradeColors[grade] || 'bg-gray-100 text-gray-600');
+
+    // Category
+    document.getElementById('info-category').textContent = option.dataset.category || '-';
+
+    // Book Value
+    const bv = parseFloat(option.dataset.bookValue) || 0;
+    document.getElementById('info-book-value').textContent = 'Rp' + bv.toLocaleString('id-ID');
+
+    // Depreciation
+    const depr = parseFloat(option.dataset.depreciation) || 0;
+    document.getElementById('info-depreciation').textContent = 'Rp' + depr.toLocaleString('id-ID') + '/thn';
+
+    // Warning for C/D/E grades
+    const warnEl = document.getElementById('info-warning');
+    const warnText = document.getElementById('info-warning-text');
+    if (grade === 'C') {
+        warnEl.classList.remove('hidden');
+        warnText.textContent = 'Aset grade C memerlukan persetujuan atasan untuk peminjaman.';
+    } else if (grade === 'D' || grade === 'E') {
+        warnEl.classList.remove('hidden');
+        warnText.textContent = 'Aset sedang dalam kondisi rusak. Hubungi admin untuk informasi lebih lanjut.';
+    } else {
+        warnEl.classList.add('hidden');
+    }
+}
+</script>
 @endsection
