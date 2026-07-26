@@ -46,8 +46,19 @@ class AssetLoanController extends Controller
         $assets = $query->get();
         $categories = \App\Models\Category::has('assets')->get();
         $groupedAssets = $assets->groupBy(fn($a) => $a->category->category_name ?? 'Tanpa Kategori');
+        
+        $assetsJson = $assets->load('category', 'location')->keyBy('id_assets')->map(fn($a) => [
+            'id' => $a->id_assets,
+            'code' => $a->asset_code,
+            'name' => $a->asset_name,
+            'condition' => $a->condition,
+            'category' => $a->category?->category_name ?? '-',
+            'location' => $a->location?->location_name ?? '-',
+            'book_value' => $a->book_value,
+            'depreciation' => $a->annual_depreciation,
+        ]);
             
-        return view('loans.create', compact('assets', 'categories', 'groupedAssets'));
+        return view('loans.create', compact('assets', 'categories', 'groupedAssets', 'assetsJson'));
     }
 
     public function store(Request $request)

@@ -218,18 +218,7 @@ function selectAsset(card, assetId) {
     panel.classList.remove('hidden');
 
     // Get data from hidden attributes in the card's radio
-    const allAssets = @json($assets->map(function($a) {
-        return [
-            'id' => $a->id_assets,
-            'code' => $a->asset_code,
-            'name' => $a->asset_name,
-            'condition' => $a->condition,
-            'category' => $a->category ? $a->category->category_name : '-',
-            'location' => $a->location ? $a->location->location_name : '-',
-            'book_value' => $a->book_value,
-            'depreciation' => $a->annual_depreciation,
-        ];
-    })->keyBy('id'));
+    const allAssets = @json($assetsJson);
 
     const data = allAssets[assetId];
     if (!data) return;

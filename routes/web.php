@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
 	Route::post('repairs/{repair}/handover', [App\Http\Controllers\AssetRepairController::class, 'handover'])->name('repairs.handover');
 
 	// Audits
+	Route::get('audits/download-data', [App\Http\Controllers\AssetAuditDataController::class, 'download'])->name('audits.download_data');
 	Route::get('audits', [App\Http\Controllers\AssetAuditController::class, 'index'])->name('audits.index');
 	Route::post('audits', [App\Http\Controllers\AssetAuditController::class, 'store'])->name('audits.store');
 	Route::get('audits/{audit}', [App\Http\Controllers\AssetAuditController::class, 'show'])->name('audits.show');

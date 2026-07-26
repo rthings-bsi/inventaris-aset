@@ -47,11 +47,39 @@
         </form>
     </div>
 
-    <!-- Add Audit Action Button -->
-    <button onclick="document.getElementById('new-audit-modal').classList.remove('hidden')" class="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-[14px] font-black text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-[0_10px_25px_rgba(79,70,229,0.35)] hover:shadow-[0_15px_35px_rgba(79,70,229,0.45)] hover:-translate-y-1 border border-white/20 whitespace-nowrap">
-        <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-500 text-lg"></i>
-        Mulai Audit Baru
-    </button>
+    <div class="flex gap-3">
+        <!-- Download Data Dropdown -->
+        <div class="relative group/download">
+            <button onclick="toggleDownloadDropdown()" class="w-full sm:w-auto group relative inline-flex items-center justify-center px-6 py-3.5 text-[13px] font-black text-indigo-600 transition-all duration-300 bg-white/80 backdrop-blur-md rounded-xl border-2 border-indigo-100 hover:border-indigo-300 hover:bg-white hover:shadow-lg hover:-translate-y-0.5 shadow-sm whitespace-nowrap">
+                <i class="fas fa-download mr-2 group-hover:scale-110 transition-transform"></i>
+                Download Data
+                <i class="fas fa-chevron-down ml-2 text-[10px] group-hover/download:rotate-180 transition-transform"></i>
+            </button>
+            <div id="download-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-indigo-50 overflow-hidden z-50">
+                <div class="py-2">
+                    <span class="px-4 py-2 text-[9px] font-black uppercase tracking-widest text-gray-400 block">Filter Periode</span>
+                    <a href="{{ route('audits.download_data', ['period' => 'weekly']) }}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                        <span class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xs"><i class="fas fa-calendar-week"></i></span>
+                        Minggu Ini
+                    </a>
+                    <a href="{{ route('audits.download_data', ['period' => 'monthly']) }}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                        <span class="w-8 h-8 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xs"><i class="fas fa-calendar-alt"></i></span>
+                        Bulan Ini
+                    </a>
+                    <a href="{{ route('audits.download_data', ['period' => 'yearly']) }}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-all">
+                        <span class="w-8 h-8 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xs"><i class="fas fa-calendar"></i></span>
+                        Tahun Ini
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Audit Action Button -->
+        <button onclick="document.getElementById('new-audit-modal').classList.remove('hidden')" class="w-full sm:w-auto group relative inline-flex items-center justify-center px-8 py-3.5 text-[14px] font-black text-white transition-all duration-300 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-[0_10px_25px_rgba(79,70,229,0.35)] hover:shadow-[0_15px_35px_rgba(79,70,229,0.45)] hover:-translate-y-1 border border-white/20 whitespace-nowrap">
+            <i class="fas fa-plus-circle mr-2 group-hover:rotate-90 transition-transform duration-500 text-lg"></i>
+            Mulai Audit Baru
+        </button>
+    </div>
 </div>
 
 <!-- Main Content Area -->
@@ -316,6 +344,20 @@
 </div>
 
 <script>
+    function toggleDownloadDropdown() {
+        const dd = document.getElementById('download-dropdown');
+        dd.classList.toggle('hidden');
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function(e) {
+        const dd = document.getElementById('download-dropdown');
+        const btn = dd?.previousElementSibling;
+        if (dd && !dd.contains(e.target) && !btn?.contains(e.target)) {
+            dd.classList.add('hidden');
+        }
+    });
+
     function handleDelete(btn) {
         confirmAction({
             title: 'Hapus Sesi Audit?',
